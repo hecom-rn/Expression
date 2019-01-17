@@ -1,0 +1,16 @@
+{
+  "name": "@hecom/expression",
+  "version": "0.0.1",
+  "description": "Calculate Expression",
+  "main": "dist/index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.com:hecom/expression.git"
+  },
+  "author": "Xiaosong Gao",
+  "license": "MIT",
+  "peerDependencies": {
+    "@hecom/userinfo": "*"
+  }
+}
