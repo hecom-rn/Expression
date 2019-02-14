@@ -79,7 +79,7 @@ function _analyze(exprStr, fieldnames) {
         let inRelation = false;
         for (let i = 0; i < expr.length; i++) {
             const char = expr.charAt(i);
-            if (char >= 'a' && char <= 'z' || char >= 'A' && char <= 'Z' || pos >= 0 && char >= '0' && char <= '9') {
+            if (char >= 'a' && char <= 'z' || char >= 'A' && char <= 'Z' || pos >= 0 && char >= '0' && char <= '9' || char === '_') {
                 if (pos < 0) {
                     pos = i;
                 }
