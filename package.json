@@ -1,16 +1,25 @@
 {
   "name": "@hecom/expression",
   "version": "1.0.1",
+  "private": false,
   "description": "Calculate Expression",
-  "main": "dist/index.js",
-  "scripts": {},
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "./node_modules/.bin/eslint . --ext .ts,.tsx"
+  },
   "repository": {
     "type": "git",
-    "url": "git@gitlab.com:hecom/expression.git"
+    "url": "https://github.com/hecom-rn/Expression.git"
   },
   "author": "Xiaosong Gao",
   "license": "MIT",
-  "peerDependencies": {
-    "@hecom/userinfo": "*"
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "eslint-plugin-automatic": "latest"
+  },
+  "dependencies": {
+    "@hecom/userinfo": "latest"
   }
 }

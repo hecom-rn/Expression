@@ -1,28 +1,32 @@
 import UserInfo from '@hecom/userinfo';
 
+export type AnalyzeResult = string[];
+
 export default {
     calculate: _calculate,
     analyze: _analyze,
 };
 
-function _calculate(exprStr, fieldnames, data) {
+/**
+ * 计算表达式的值，返回计算结果。
+ * @param exprStr 表达式，必须是"${...}"格式
+ * @param fieldnames 表达式中应该包含哪些字段名称，不传的话，则所有不是函数的都是字段名称
+ * @param data 业务对象的数据
+ */
+function _calculate(exprStr: string, fieldnames: string[], data): any {
     const expr = exprStr.slice(2, exprStr.length - 1);
-    let result;
+    let result; // eslint-disable-line init-declarations
     try {
         const fields = _analyze(exprStr, fieldnames);
         const hasUndefined = fields.some(function (item) {
-            if (Array.isArray(item)) {
-                const tempData = item.reduce(function (prv, cur) {
-                    if (prv && prv[cur]) {
-                        return prv[cur];
-                    } else {
-                        return undefined;
-                    }
-                }, {bizData: data});
-                return typeof tempData === 'undefined';
-            } else {
-                return typeof data[item] === 'undefined';
-            }
+            const tempData = item.reduce(function (prv, cur) {
+                if (prv && prv[cur]) {
+                    return prv[cur];
+                } else {
+                    return undefined;
+                }
+            }, {bizData: data});
+            return tempData === undefined;
         });
         if (hasUndefined) {
             return undefined;
@@ -30,30 +34,28 @@ function _calculate(exprStr, fieldnames, data) {
         let script = '';
         script = 'var bizData = {};';
         fields.forEach(function (fieldname) {
-            if (Array.isArray(fieldname)) {
-                script = script +
-                    'bizData.' + fieldname[1] + '=' + JSON.stringify(data[fieldname[1]]) + ';';
-            } else {
-                script = script +
-                    'bizData.' + fieldname + '=' + JSON.stringify(data[fieldname]) + ';';
-            }
+            script = script + 'bizData.' + fieldname[1] + '=' + JSON.stringify(data[fieldname[1]]) + ';';
         });
         script = script + 'result = ' + expr + ';';
         eval(script);
     } catch (error) {
-        console.error('Expression ' + expr + ' is error with fields ' + JSON.stringify(fieldnames)
-            + ' with data ' + JSON.stringify(data) + '.');
+        console.error('Expression', expr, 'is error with fields', JSON.stringify(fieldnames), 'with data', JSON.stringify(data) + '.');
     }
     return result;
 }
 
-function _analyze(exprStr, fieldnames) {
+/**
+ * 解析表达式中包含的字段列表，查找关系内部使用数组来表示字段的层级。
+ * @param exprStr 表达式
+ * @param fieldnames 表达式中应该包含哪些字段名称，不传的话，则所有不是函数的都是字段名称
+ */
+function _analyze(exprStr: string, fieldnames: string[]): AnalyzeResult[] {
     const expr = exprStr.slice(2, exprStr.length - 1);
-    const concatExprFunc = function (seperatorChar, expr) {
+    const concatExprFunc = function (seperatorChar, exprParam) {
         const positions = [];
         let pos = -1;
-        for (let i = 0; i < expr.length; i++) {
-            const char = expr.charAt(i);
+        for (let i = 0; i < exprParam.length; i++) {
+            const char = exprParam.charAt(i);
             if (char === seperatorChar) {
                 if (pos < 0) {
                     pos = i;
@@ -66,24 +68,24 @@ function _analyze(exprStr, fieldnames) {
                 }
             }
         }
-        let result = expr;
+        let r = exprParam;
         for (let i = positions.length - 1; i >= 0; i--) {
             const item = positions[i];
-            result = result.substring(0, item.start + 1) + result.substring(item.end);
+            r = r.substring(0, item.start + 1) + r.substring(item.end);
         }
-        return result;
+        return r;
     };
-    const substrExprFunc = function (expr) {
+    const substrExprFunc = function (exprParam) {
         const positions = [];
         let pos = -1;
         let inRelation = false;
-        for (let i = 0; i < expr.length; i++) {
-            const char = expr.charAt(i);
+        for (let i = 0; i < exprParam.length; i++) {
+            const char = exprParam.charAt(i);
             if (char >= 'a' && char <= 'z' || char >= 'A' && char <= 'Z' || pos >= 0 && char >= '0' && char <= '9' || char === '_') {
                 if (pos < 0) {
                     pos = i;
                 }
-                if (i === expr.length - 1) {
+                if (i === exprParam.length - 1) {
                     if (inRelation) {
                         positions[positions.length - 1].push({
                             start: pos,
@@ -136,10 +138,10 @@ function _analyze(exprStr, fieldnames) {
             const item = positions[i];
             if (Array.isArray(item)) {
                 variables.push(item.map(function (itemfield) {
-                    return expr.substring(itemfield.start, itemfield.end + 1);
+                    return exprParam.substring(itemfield.start, itemfield.end + 1);
                 }));
             } else {
-                variables.push(expr.substring(item.start, item.end + 1));
+                variables.push(exprParam.substring(item.start, item.end + 1));
             }
         }
         return variables;
@@ -168,7 +170,7 @@ function _analyze(exprStr, fieldnames) {
             } else if (Object.keys(_DefaultExpressionFuncs).indexOf(varname) >= 0) {
                 return false;
             } else {
-                console.log('Format error ' + exprStr);
+                console.error('Format error', exprStr);
                 return false;
             }
         });
