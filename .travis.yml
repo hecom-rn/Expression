@@ -7,7 +7,7 @@ os:
 stages:
  - test
  - name: deploy
-   if: (branch = master) AND (tag =~ ^v)
+   if: tag =~ ^v
 
 jobs:
   include:
