@@ -20,7 +20,7 @@ function _calculate(exprStr: string, fieldnames: string[], data): any {
         const fields = _analyze(exprStr, fieldnames);
         const hasUndefined = fields.some(function (item) {
             const tempData = item.reduce(function (prv, cur) {
-                if (prv && prv[cur]) {
+                if (prv && prv[cur] !== undefined) {
                     return prv[cur];
                 } else {
                     return undefined;
