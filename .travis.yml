@@ -7,7 +7,7 @@ os:
 stages:
  - test
  - name: deploy
-   if: tag =~ ^v
+   if: tag IS present
 
 jobs:
   include:
