@@ -36,21 +36,7 @@ function _calculate(exprStr: string, fieldnames?: string[], data?): any {
     let result; // eslint-disable-line init-declarations
     try {
         const fields = _analyze(exprStr, fieldnames);
-        const hasUndefined = fields.some(function (item) {
-            const tempData = item.reduce(function (prv, cur) {
-                if (prv && prv[cur] !== undefined) {
-                    return prv[cur];
-                } else {
-                    return undefined;
-                }
-            }, {bizData: data});
-            return tempData === undefined;
-        });
-        if (hasUndefined) {
-            return undefined;
-        }
-        let script = '';
-        script = 'var bizData = {};';
+        let script = 'var bizData = {};';
         fields.forEach(function (fieldname) {
             script = script + 'bizData.' + fieldname[1] + '=' + JSON.stringify(data[fieldname[1]]) + ';';
         });
