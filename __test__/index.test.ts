@@ -64,6 +64,14 @@ describe('formula', () => {
         expect(result).toBeTruthy();
     });
 
+    test('TIMEDIF', () => {
+        const dif = 48.32894;
+        const start = Date.now();
+        const end = start - dif * 60 * 60 * 1000;
+        const result = expression(`TIMEDIF(${start}, ${end})`);
+        expect(result).toBe(Math.round(dif * 100) / 100)
+    });
+
     test('CURRENT_USER', () => {
         const result = expression(`CURRENT_USER()`);
         expect(result.code).toBe(user.code);

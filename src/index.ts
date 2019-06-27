@@ -197,7 +197,7 @@ function _analyze(exprStr: string, fieldnames: string[]): AnalyzeResult[] {
 
 const _DefaultExpressionFuncs = {
     ABS, CEILING, FLOOR, LN, LOG, MOD, ROUND, SQRT,
-    DATEDIF, TODAY, NOW, DATEOFFSET,
+    TIMEDIF, DATEDIF, TODAY, NOW, DATEOFFSET,
     AND, OR, IF, TRUE, FALSE, CASE, NULL,
     LEFT, RIGHT, SEARCH, CONCATENATE, TEXT,
     CURRENT_USER, CURRENT_ORG,
@@ -237,6 +237,16 @@ function ROUND(number, num_digits) {
 
 function SQRT(number) {
     return Math.sqrt(number);
+}
+
+function TIMEDIF(startTime, endTime) {
+    const start = Number(startTime);
+    const end = Number(endTime);
+    if (start && end) {
+        return ROUND(Math.abs(start - end) / (60 * 60 * 1000), 2)
+    } else {
+        return 0
+    }
 }
 
 function DATEDIF(startDateTimestamp, endDateTimestamp, unit) {
