@@ -1,11 +1,29 @@
-import UserInfo from '@hecom/userinfo';
-
 export type AnalyzeResult = string[];
+
+interface User {
+    code: string
+    name: string
+    dept: {
+        code: string
+        name: string
+    }
+}
+
+interface Config {
+    currentUser?: () => User
+}
+
+let defConfig: Config = {};
 
 export default {
     calculate: _calculate,
     analyze: _analyze,
+    setConfig,
 };
+
+function setConfig(config: Config) {
+    Object.assign(defConfig, config);
+}
 
 /**
  * 计算表达式的值，返回计算结果。
@@ -13,7 +31,7 @@ export default {
  * @param fieldnames 表达式中应该包含哪些字段名称，不传的话，则所有不是函数的都是字段名称
  * @param data 业务对象的数据
  */
-function _calculate(exprStr: string, fieldnames: string[], data): any {
+function _calculate(exprStr: string, fieldnames?: string[], data?): any {
     const expr = exprStr.slice(2, exprStr.length - 1);
     let result; // eslint-disable-line init-declarations
     try {
@@ -149,14 +167,14 @@ function _analyze(exprStr: string, fieldnames: string[]): AnalyzeResult[] {
     const funcs = [
         concatExprFunc.bind(this, '"'),
         concatExprFunc.bind(this, "'"),
-        substrExprFunc,
     ];
-    let result = expr;
+    let temp = expr;
     funcs.forEach(function (func) {
-        result = func(result);
+        temp = func(temp);
     });
+    const result = substrExprFunc(temp);
     if (Array.isArray(fieldnames) && fieldnames.length > 0) {
-        return result.filter(function (varname) {
+        return result.filter(function (varname: string[]) {
             if (Array.isArray(varname) && varname.length >= 2 && varname[0] === 'bizData') {
                 return fieldnames.indexOf(varname[1]) >= 0;
             } else {
@@ -164,7 +182,7 @@ function _analyze(exprStr: string, fieldnames: string[]): AnalyzeResult[] {
             }
         });
     } else {
-        return result.filter(function (varname) {
+        return result.filter(function (varname: string[] | string) {
             if (Array.isArray(varname)) {
                 return varname.length >= 2 && varname[0] === 'bizData';
             } else if (Object.keys(_DefaultExpressionFuncs).indexOf(varname) >= 0) {
@@ -270,19 +288,19 @@ function DATEOFFSET(startDateTimestamp, unit, value) {
     }
 }
 
-function AND() {
+function AND(...args: any[]) {
     let result = true;
-    for (const arg of arguments) {
-        result = result && arg;
-    }
+    args.forEach(arg => {
+        result = result && arg
+    });
     return result;
 }
 
-function OR() {
+function OR(...args: any[]) {
     let result = false;
-    for (const arg of arguments) {
+    args.forEach(arg => {
         result = result || arg;
-    }
+    });
     return result;
 }
 
@@ -338,7 +356,8 @@ function TEXT(value) {
 }
 
 function CURRENT_USER() {
-    const user = UserInfo.get();
+    if (!defConfig.currentUser) return;
+    const user = defConfig.currentUser();
     return {
         code: user.code,
         name: user.name,
@@ -346,7 +365,8 @@ function CURRENT_USER() {
 }
 
 function CURRENT_ORG() {
-    const dept = UserInfo.part.dept();
+    if (!defConfig.currentUser) return;
+    const {dept} = defConfig.currentUser();
     return {
         code: dept.code,
         name: dept.name,
@@ -355,8 +375,8 @@ function CURRENT_ORG() {
 
 function _dateFromAny(obj) {
     if (typeof obj === 'string') {
-        const times = obj.split(/[ :/-]/, 6);
-        return new Date(...times);
+        const times = obj.split(/[ :/-]/, 6).map(item => Number(item));
+        return new Date(times[0], times[1], times[2], times[3], times[4], times[5]);
     } else if (typeof obj === 'number') {
         return new Date(obj);
     } else {

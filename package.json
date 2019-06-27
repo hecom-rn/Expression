@@ -5,7 +5,7 @@
   "description": "Calculate Expression",
   "main": "src/index.ts",
   "scripts": {
-    "test": "./node_modules/.bin/eslint . --ext .ts,.tsx",
+    "test": "./node_modules/.bin/eslint . --ext .ts,.tsx; jest",
     "minor": "npm version patch -m 'Bump version %s';git push origin master --tags",
     "patch": "npm version patch -m 'Bump version %s';git push origin master --tags"
   },
@@ -19,9 +19,11 @@
     "access": "public"
   },
   "devDependencies": {
-    "eslint-plugin-automatic": "*"
-  },
-  "peerDependencies": {
-    "@hecom/userinfo": "*"
+    "@types/jest": "^24.0.15",
+    "eslint-plugin-automatic": "*",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.2",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.2"
   }
 }
