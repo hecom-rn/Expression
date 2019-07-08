@@ -43,7 +43,7 @@ function _calculate(exprStr: string, fieldnames?: string[], data?): any {
         script = script + 'result = ' + expr + ';';
         eval(script);
     } catch (error) {
-        console.error('Expression', expr, 'is error with fields', JSON.stringify(fieldnames), 'with data', JSON.stringify(data) + '.');
+        console.warn('Expression', expr, 'is error with fields', JSON.stringify(fieldnames), 'with data', JSON.stringify(data) + '.');
     }
     return result;
 }
@@ -174,7 +174,7 @@ function _analyze(exprStr: string, fieldnames: string[]): AnalyzeResult[] {
             } else if (Object.keys(_DefaultExpressionFuncs).indexOf(varname) >= 0) {
                 return false;
             } else {
-                console.error('Format error', exprStr);
+                console.warn('Format error', exprStr);
                 return false;
             }
         });
@@ -225,14 +225,19 @@ function SQRT(number) {
     return Math.sqrt(number);
 }
 
-function TIMEDIF(startTime, endTime) {
-    const start = Number(startTime);
-    const end = Number(endTime);
-    if (start && end) {
-        return ROUND(Math.abs(start - end) / (60 * 60 * 1000), 2)
-    } else {
-        return 0
+function TIMEDIF(startTime, endTime, unit) {
+    const diff = Math.abs(Number(startTime) - Number(endTime));
+    if (!isNaN(diff)) {
+        if (unit === 'h') {
+            return Math.floor(diff / 1000 / 3600)
+        } else if (unit === 'm') {
+            return Math.floor(diff / 1000 / 60)
+        } else if (unit === 's') {
+            return Math.floor(diff / 1000)
+        }
+
     }
+    return 0;
 }
 
 function DATEDIF(startDateTimestamp, endDateTimestamp, unit) {

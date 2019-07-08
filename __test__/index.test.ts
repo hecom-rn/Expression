@@ -65,11 +65,15 @@ describe('formula', () => {
     });
 
     test('TIMEDIF', () => {
-        const dif = 48.32894;
+        const dif = 4832894;
         const start = Date.now();
-        const end = start - dif * 60 * 60 * 1000;
-        const result = expression(`TIMEDIF(${start}, ${end})`);
-        expect(result).toBe(Math.round(dif * 100) / 100)
+        const end = start - dif;
+        const units = ['h', 'm', 's'];
+        units.forEach(unit => {
+            const result = expression(`TIMEDIF(${start}, ${end}, "${unit}")`);
+            const div = unit === 'h' ? 1000 * 3600 : unit === 'm' ? 1000 * 60 : 1000;
+            expect(result).toBe(Math.floor(dif / div))
+        });
     });
 
     test('CURRENT_USER', () => {
