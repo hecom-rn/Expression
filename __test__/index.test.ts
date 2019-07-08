@@ -4,6 +4,9 @@ function expression(content: string, data?: any, fieldNames?: any) {
     return Expression.calculate('${' + content + '}', fieldNames, data);
 }
 
+/**
+ * 函数相关的表达式测试用例
+ */
 describe('formula', () => {
     const user = {code: '123', name: 'test', dept: {code: '2', name: 'testDept'}};
     const callbackFuncMap = {
