@@ -228,7 +228,7 @@ function SQRT(number) {
 function TIMEDIF(startTime, endTime, unit) {
     const diff = Math.abs(Number(startTime) - Number(endTime));
     if (!isNaN(diff)) {
-        if (unit === 'h') {
+        if (unit === 'h' || unit === 'H') {
             return Math.floor(diff / 1000 / 3600)
         } else if (unit === 'm') {
             return Math.floor(diff / 1000 / 60)
@@ -243,11 +243,11 @@ function TIMEDIF(startTime, endTime, unit) {
 function DATEDIF(startDateTimestamp, endDateTimestamp, unit) {
     const startDate = _dateFromAny(startDateTimestamp);
     const endDate = _dateFromAny(endDateTimestamp);
-    if (unit === 'Y') {
+    if (unit === 'Y' || unit === 'y') {
         return endDate.getFullYear() - startDate.getFullYear();
     } else if (unit === 'M') {
         return endDate.getMonth() - startDate.getMonth() + (endDate.getFullYear() - startDate.getFullYear()) * 12;
-    } else if (unit === 'D') {
+    } else if (unit === 'D' || unit === 'd') {
         return Math.floor((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
     } else if (unit === 'MD') {
         return endDate.getDate() - startDate.getDate();
@@ -272,7 +272,7 @@ function NOW() {
 
 function DATEOFFSET(startDateTimestamp, unit, value) {
     const date = _dateFromAny(startDateTimestamp);
-    if (unit === 'Y') {
+    if (unit === 'Y' || unit === 'y') {
         date.setFullYear(date.getFullYear() + value);
         return date.getTime();
     } else if (unit === 'M') {
@@ -280,9 +280,9 @@ function DATEOFFSET(startDateTimestamp, unit, value) {
         date.setMonth(month % 12);
         date.setFullYear(date.getFullYear() + month / 12);
         return date.getTime();
-    } else if (unit === 'D') {
+    } else if (unit === 'D' || unit === 'd') {
         return date.getTime() + value * 24 * 60 * 60 * 1000;
-    } else if (unit === 'H') {
+    } else if (unit === 'H' || unit === 'h') {
         return date.getTime() + value * 60 * 60 * 1000;
     } else {
         return date.getTime();
