@@ -226,7 +226,7 @@ function SQRT(number) {
 }
 
 function TIMEDIF(startTime, endTime, unit) {
-    const diff = Math.abs(Number(startTime) - Number(endTime));
+    const diff = Number(endTime) - Number(startTime);
     if (!isNaN(diff)) {
         if (unit === 'h' || unit === 'H') {
             return Math.floor(diff / 1000 / 3600)
