@@ -70,13 +70,19 @@ describe('formula', () => {
     test('TIMEDIF', () => {
         const dif = 4832894;
         const start = Date.now();
-        const end = start + dif;
+        let end = start + dif;
         const units = ['h', 'm', 's'];
         units.forEach(unit => {
             const result = expression(`TIMEDIF(${start}, ${end}, "${unit}")`);
             const div = unit === 'h' ? 1000 * 3600 : unit === 'm' ? 1000 * 60 : 1000;
             expect(result).toBe(Math.floor(dif / div))
         });
+        end = start - dif;
+        units.forEach(unit => {
+            const result = expression(`TIMEDIF(${start}, ${end}, "${unit}")`);
+            const div = unit === 'h' ? 1000 * 3600 : unit === 'm' ? 1000 * 60 : 1000;
+            expect(result).toBe(Math.ceil(-dif / div))
+        })
     });
 
     test('CURRENT_USER', () => {

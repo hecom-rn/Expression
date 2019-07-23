@@ -228,12 +228,13 @@ function SQRT(number) {
 function TIMEDIF(startTime, endTime, unit) {
     const diff = Number(endTime) - Number(startTime);
     if (!isNaN(diff)) {
+        const func = diff >= 0 ? Math.floor : Math.ceil;
         if (unit === 'h' || unit === 'H') {
-            return Math.floor(diff / 1000 / 3600)
+            return func(diff / 1000 / 3600)
         } else if (unit === 'm') {
-            return Math.floor(diff / 1000 / 60)
+            return func(diff / 1000 / 60)
         } else if (unit === 's') {
-            return Math.floor(diff / 1000)
+            return func(diff / 1000)
         }
 
     }
