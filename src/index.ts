@@ -378,7 +378,7 @@ function CURRENT_ORG() {
 function _dateFromAny(obj) {
     if (typeof obj === 'string') {
         const times = obj.split(/[ :/-]/, 6).map(item => Number(item));
-        return new Date(times[0], times[1], times[2], times[3], times[4], times[5]);
+        return new Date(times[0], times[1] || 0, times[2] || 1, times[3] || 0, times[4] || 0, times[5] || 0);
     } else if (typeof obj === 'number') {
         return new Date(obj);
     } else {
