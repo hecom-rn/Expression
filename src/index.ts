@@ -388,17 +388,13 @@ function _dateFromAny(obj) {
 
 function TO_CAPITAL_RMB(money) {
     if (money === undefined || money === null || money === '') {
-        return null;
+        return '';
     }
 
     try {
-        if(typeof(money)=='string'){
-            const chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'];
-            money = money.split('').filter((charItem, index) => {
-                return charItem === '-' && index === 0 || chars.indexOf(charItem) >= 0;
-            }).join('');
+        if(isNaN(money)){
+            return '';
         }
-
         const fraction = ['角', '分'];
         const digit = [
             '零', '壹', '贰', '叁', '肆',
@@ -428,6 +424,6 @@ function TO_CAPITAL_RMB(money) {
             .replace(/(零.)+/g, '零')
             .replace(/^整$/, '零元整');
     } catch (e) {
-        return null;
+        return '';
     }
 }

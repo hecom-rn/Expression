@@ -89,5 +89,17 @@ describe('formula', () => {
         const result = expression(`CURRENT_USER()`);
         expect(result.code).toBe(user.code);
         expect(result.name).toBe(user.name);
+    });
+
+    test('TO_CAPITAL_RMB', () => {
+        const moneyArr = [
+            {key: 0.0, value: '零元整'},
+            {key: 123456789000.123, value: '壹仟贰佰叁拾肆亿伍仟陆佰柒拾捌万玖仟元壹角贰分'},
+            {key: 88776699.55, value: '捌仟捌佰柒拾柒万陆仟陆佰玖拾玖元伍角伍分'},
+        ];
+        moneyArr.forEach(item => {
+            const result = expression(`TO_CAPITAL_RMB(${item.key})`);
+            expect(result).toBe(item.value);
+        });
     })
 });
