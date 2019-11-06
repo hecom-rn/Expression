@@ -186,7 +186,7 @@ const _DefaultExpressionFuncs = {
     TIMEDIF, DATEDIF, TODAY, NOW, DATEOFFSET,
     AND, OR, IF, TRUE, FALSE, CASE, NULL,
     LEFT, RIGHT, SEARCH, CONCATENATE, TEXT,
-    CURRENT_USER, CURRENT_ORG,
+    CURRENT_USER, CURRENT_ORG, TO_CAPITAL_RMB
 };
 
 function ABS(number) {
@@ -383,5 +383,51 @@ function _dateFromAny(obj) {
         return new Date(obj);
     } else {
         return obj;
+    }
+}
+
+function TO_CAPITAL_RMB(money) {
+    if (money === undefined || money === null || money === '') {
+        return null;
+    }
+
+    try {
+        if(typeof(money)=='string'){
+            const chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'];
+            money = money.split('').filter((charItem, index) => {
+                return charItem === '-' && index === 0 || chars.indexOf(charItem) >= 0;
+            }).join('');
+        }
+
+        const fraction = ['角', '分'];
+        const digit = [
+            '零', '壹', '贰', '叁', '肆',
+            '伍', '陆', '柒', '捌', '玖'
+        ];
+        const unit = [
+            ['元', '万', '亿'],
+            ['', '拾', '佰', '仟']
+        ];
+        const head = money < 0 ? '负' : '';
+        money = Math.abs(money);
+        let chinese = '';
+        for (let i = 0; i < fraction.length; i++) {
+            chinese += (digit[Math.floor(money * 10 * Math.pow(10, i)) % 10] + fraction[i]).replace(/零./, '');
+        }
+        chinese = chinese || '整';
+        money = Math.floor(money);
+        for (let i = 0; i < unit[0].length && money > 0; i++) {
+            let cycle = '';
+            for (let j = 0; j < unit[1].length && money > 0; j++) {
+                cycle = digit[money % 10] + unit[1][j] + cycle;
+                money = Math.floor(money / 10);
+            }
+            chinese = cycle.replace(/(零.)*零$/, '').replace(/^$/, '零') + unit[0][i] + chinese;
+        }
+        return head + chinese.replace(/(零.)*零元/, '元')
+            .replace(/(零.)+/g, '零')
+            .replace(/^整$/, '零元整');
+    } catch (e) {
+        return null;
     }
 }
