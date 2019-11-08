@@ -183,7 +183,7 @@ function _analyze(exprStr: string, fieldnames: string[]): AnalyzeResult[] {
 
 const _DefaultExpressionFuncs = {
     ABS, CEILING, FLOOR, LN, LOG, MOD, ROUND, SQRT,
-    TIMEDIF, DATEDIF, TODAY, NOW, DATEOFFSET,
+    TIMEDIF, DATEDIF, TODAY, NOW, DATEOFFSET, TIMEOFFSET,
     AND, OR, IF, TRUE, FALSE, CASE, NULL,
     LEFT, RIGHT, SEARCH, CONCATENATE, TEXT,
     CURRENT_USER, CURRENT_ORG, TO_CAPITAL_RMB
@@ -269,6 +269,10 @@ function TODAY() {
 
 function NOW() {
     return Date.now();
+}
+
+function TIMEOFFSET(startTimestamp, unit, value) {
+    return DATEOFFSET(startTimestamp, unit, value)
 }
 
 function DATEOFFSET(startDateTimestamp, unit, value) {
@@ -392,7 +396,7 @@ function TO_CAPITAL_RMB(money) {
     }
 
     try {
-        if(isNaN(money)){
+        if (isNaN(money)) {
             return '';
         }
         const fraction = ['角', '分'];
