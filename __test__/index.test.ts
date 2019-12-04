@@ -103,5 +103,176 @@ describe('formula', () => {
             const result = expression(`TO_CAPITAL_RMB(${item.key})`);
             expect(result).toBe(item.value);
         });
-    })
+    });
+
+    test('DAY', () => {
+        const dateArr = [
+            {key: '"2019-10-10"', value: 10},
+            {key: '"2019/12/15"', value: 15},
+            {key: '"异常测试"', value: ''},
+            {key: null, value: ''}
+        ];
+        dateArr.forEach(item => {
+            const result = expression(`DAY(${item.key})`);
+            expect(result).toBe(item.value);
+        });
+    });
+
+    test('MONTH', () => {
+        const dateArr = [
+            {key: '"2019-1-10"', value: 1},
+            {key: '"2019/12/15"', value: 12},
+            {key: '"异常测试"', value: ''},
+            {key: undefined, value: ''}
+        ];
+        dateArr.forEach(item => {
+            const result = expression(`MONTH(${item.key})`);
+            expect(result).toBe(item.value);
+        });
+    });
+
+    test('YEAR', () => {
+        const dateArr = [
+            {key: '"2019-1-10"', value: 2019},
+            {key: '"1990/12/15"', value: 1990},
+            {key: '"异常测试"', value: ''},
+            {key: '', value: ''}
+        ];
+        dateArr.forEach(item => {
+            const result = expression(`YEAR(${item.key})`);
+            expect(result).toBe(item.value);
+        });
+    });
+
+    test('DATE', () => {
+        const dateArr = [
+            {key: [2019, 12, 1], value: '2019年12月1日'},
+            {key: [1990, 1, 1], value: '1990年1月1日'},
+            {key: ['"异常测试"', '"嘻嘻"', '"哈哈"'], value: ''},
+            {key: [undefined, 9, 27], value: ''},
+            {key: [9012, '""', 27], value: ''},
+            {key: [9876, 9, null], value: ''},
+        ];
+        dateArr.forEach(item => {
+            const result = expression(`DATE(${item.key[0]}, ${item.key[1]}, ${item.key[2]})`);
+            expect(result).toBe(item.value);
+        });
+    });
+
+    test('THOUSANDSEP', () => {
+        const dateArr = [
+            {key: 12340.789, value: '12,340.789'},
+            {key: 123456, value: '123,456'},
+            {key: 123, value: '123'},
+            {key: 1, value: '1'},
+            {key: '"异常测试"', value: ''},
+            {key: undefined, value: ''},
+        ];
+        dateArr.forEach(item => {
+            const result = expression(`THOUSANDSEP(${item.key})`);
+            expect(result).toBe(item.value);
+        });
+    });
+
+    test('MAX', () => {
+        const dateArr = [
+            {key: [-23, -45, -90, -61235, -3214, -6123599], value: -23},
+            {key: [23, 45, 90, 61235, 0, 3214, -6123599], value: 61235},
+            {key: [23, 45, 90, 61235, 0, 3214, 61235], value: 61235},
+            {key: [23, 45, 90, 61235, 0, 3214, ''], value: 61235},
+            {key: [23, 45, 90, 61235, 0, 3214, '"异常测试"'], value: ''},
+            {key: [], value: ''},
+        ];
+        dateArr.forEach(item => {
+            const result = expression(`MAX(${item.key})`);
+            expect(result).toBe(item.value);
+        });
+    });
+
+    test('MIN', () => {
+        const dateArr = [
+            {key: [23, 45, 90, 61235, 0, 3214], value: 0},
+            {key: [23, 45, 90, 61235, 0, 3214, -1], value: -1},
+            {key: [23, 45, 90, 61235, 3214, 0.9], value: 0.9},
+            {key: [23, 45, 90, 61235, 0, 3214, -2], value: -2},
+        ];
+        dateArr.forEach(item => {
+            const result = expression(`MIN(${item.key})`);
+            expect(result).toBe(item.value);
+        });
+    });
+
+    test('TOCAPITAL', () => {
+        const dateArr = [
+            {key: 0, value: '零'},
+            {key: 0.9, value: '零点玖'},
+            {key: 12345, value: '壹万贰仟叁佰肆拾伍'},
+            {key: 67897.87, value: '陆万柒仟捌佰玖拾柒点捌柒'},
+            {key: '"异常测试"', value: ''},
+        ];
+        dateArr.forEach(item => {
+            const result = expression(`TOCAPITAL(${item.key})`);
+            expect(result).toBe(item.value);
+        });
+    });
+
+    test('FIND', () => {
+        const dateArr = [
+            {key: ['"p"', '"applepay"', 4], value: 5},
+            {key: ['"p"', '"applepay"', 9], value: ''},
+            {key: ['"西"', '"applepay"', 9], value: ''},
+        ];
+        dateArr.forEach(item => {
+            const result = expression(`FIND(${item.key[0]}, ${item.key[1]}, ${item.key[2]})`);
+            expect(result).toBe(item.value);
+        });
+    });
+
+    test('TONUMBER', () => {
+        const dateArr = [
+            {key: '"209.23"', value: 209.23},
+            {key: '"209"', value: 209},
+            {key: '"异常测试"', value: ''},
+        ];
+        dateArr.forEach(item => {
+            const result = expression(`TONUMBER(${item.key})`);
+            expect(result).toBe(item.value);
+        });
+    });
+
+    test('MID', () => {
+        const dateArr = [
+            {key: ['"tomorrow"', 3, 2], value: 'or'},
+            {key: ['"tomorrow"', 7, 2], value: ''},
+            {key: ['"tomorrow"', 3, 0], value: ''},
+            {key: ['"异常测试"', 9, 2], value: ''},
+        ];
+        dateArr.forEach(item => {
+            const result = expression(`MID(${item.key[0]}, ${item.key[1]}, ${item.key[2]})`);
+            expect(result).toBe(item.value);
+        });
+    });
+
+    test('ID_TO_AGE', () => {
+        const dateArr = [
+            {key: 422324199610271952, value: 24},
+            {key: 632123820927051, value: 38},
+            {key: 4223241991082719987, value: ''},
+        ];
+        dateArr.forEach(item => {
+            const result = expression(`ID_TO_AGE(${item.key})`);
+            expect(result).toBe(item.value);
+        });
+    });
+
+    test('DATEVALUE', () => {
+        const dateArr = [
+            {key: 1575456374840, value: '2019年12月4日'},
+            {key: '"2019-12-4"', value: '2019年12月4日'},
+        ];
+        dateArr.forEach(item => {
+            const result = expression(`DATEVALUE(${item.key})`);
+            expect(result).toBe(item.value);
+        });
+    });
 });
