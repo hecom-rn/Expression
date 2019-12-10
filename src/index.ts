@@ -14,15 +14,21 @@ interface Config {
 }
 
 let defConfig: Config = {};
+let defThousandFun = null;
 
 export default {
     calculate: _calculate,
     analyze: _analyze,
     setConfig,
+    setThousandFun
 };
 
 function setConfig(config: Config) {
     Object.assign(defConfig, config);
+};
+
+function setThousandFun(thousandFun: Function) {
+    defThousandFun = thousandFun;
 }
 
 /**
@@ -466,17 +472,26 @@ function DATE(year, month, day) {
     const item = [{'key': year}, {'key': month}, {'key': day}];
     const result = item.filter(i => (i.key === undefined || i.key === '' || i.key === null || isNaN(i.key)));
     if (result.length > 0) {
-        return '';
+        return 0;
     }
-    return year + '年' + month + '月' + day + '日';
+    try {
+        const date = new Date(Date.parse(year + '-' + month + '-' + day));
+        return date.getTime();
+    } catch (e) {
+        throw 'error';
+    }
 }
 
 function THOUSANDSEP(number) {
     if (number === undefined || number === '' || number === null || isNaN(number)) {
         return '';
     }
-    return number.toLocaleString();
+    if (!defThousandFun) return '';
+    return defThousandFun(number);
 }
+
+
+
 
 function MAX(...args: any[]) {
     let max = '';
@@ -484,26 +499,32 @@ function MAX(...args: any[]) {
         if (!args || (args && args.length === 0)) {
             return '';
         }
-        const notNumArr = args.filter(item => isNaN(item));
-        if (notNumArr.length > 0) {
-            return '';
+        const numArr = args.filter(item => !isNaN(item));
+        if (numArr.length === 0) {
+            throw 'error';
         }
-        max = Math.max.apply(null, args);
+        max = Math.max.apply(null, numArr);
     } catch (e) {
         return '';
     }
     return max;
 }
 
+
 function MIN(...args: any[]) {
-    if (args && args.length === 0) {
+    let min = '';
+    try {
+        if (args && args.length === 0) {
+            return '';
+        }
+        const numArr = args.filter(item => !isNaN(item));
+        if (numArr.length === 0) {
+            throw 'error';
+        }
+        min = Math.min.apply(null, numArr);
+    } catch (e) {
         return '';
     }
-    const notNumArr = args.filter(item => isNaN(item));
-    if (notNumArr.length > 0) {
-        return '';
-    }
-    const min = Math.min.apply(null, args);
     return min;
 }
 
@@ -574,16 +595,16 @@ function FIND(targetText, text, startPoint) {
     const item = [{'key': targetText}, {'key': text}, {'key': startPoint}];
     const result = item.filter(i => (i.key === undefined || i.key === '' || i.key === null));
     if (result.length > 0) {
-        return '';
+        return 0;
     }
     targetText = targetText.toString();
     text = text.toString();
     if (startPoint > text.length) {
-        return '';
+        return 0;
     }
     const subStrtext = text.substring(startPoint, text.length);
     if (subStrtext.indexOf(targetText) === -1) {
-        return '';
+        return 0;
     }
     return startPoint + subStrtext.indexOf(targetText);
 }

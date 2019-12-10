@@ -146,12 +146,12 @@ describe('formula', () => {
 
     test('DATE', () => {
         const dateArr = [
-            {key: [2019, 12, 1], value: '2019年12月1日'},
-            {key: [1990, 1, 1], value: '1990年1月1日'},
-            {key: ['"异常测试"', '"嘻嘻"', '"哈哈"'], value: ''},
-            {key: [undefined, 9, 27], value: ''},
-            {key: [9012, '""', 27], value: ''},
-            {key: [9876, 9, null], value: ''},
+            {key: [2019, 12, 1], value: 1575129600000},
+            {key: [1990, 1, 1], value: 631123200000},
+            {key: ['"异常测试"', '"嘻嘻"', '"哈哈"'], value: 0},
+            {key: [undefined, 9, 27], value: 0},
+            {key: [9012, '""', 27], value: 0},
+            {key: [9876, 9, null], value: 0},
         ];
         dateArr.forEach(item => {
             const result = expression(`DATE(${item.key[0]}, ${item.key[1]}, ${item.key[2]})`);
@@ -160,8 +160,14 @@ describe('formula', () => {
     });
 
     test('THOUSANDSEP', () => {
+        Expression.setThousandFun((num) => {
+            num = Math.round(num);
+            let formatNum = (num + '').replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g, '$1,');
+            return formatNum;
+        });
+
         const dateArr = [
-            {key: 12340.789, value: '12,340.789'},
+            {key: 12340.789, value: '12,341'},
             {key: 123456, value: '123,456'},
             {key: 123, value: '123'},
             {key: 1, value: '1'},
@@ -180,7 +186,7 @@ describe('formula', () => {
             {key: [23, 45, 90, 61235, 0, 3214, -6123599], value: 61235},
             {key: [23, 45, 90, 61235, 0, 3214, 61235], value: 61235},
             {key: [23, 45, 90, 61235, 0, 3214, ''], value: 61235},
-            {key: [23, 45, 90, 61235, 0, 3214, '"异常测试"'], value: ''},
+            {key: [23, 45, 90, 61235, 0, 3214, '"异常测试"'], value: 61235},
             {key: [], value: ''},
         ];
         dateArr.forEach(item => {
@@ -219,8 +225,8 @@ describe('formula', () => {
     test('FIND', () => {
         const dateArr = [
             {key: ['"p"', '"applepay"', 4], value: 5},
-            {key: ['"p"', '"applepay"', 9], value: ''},
-            {key: ['"西"', '"applepay"', 9], value: ''},
+            {key: ['"p"', '"applepay"', 9], value: 0},
+            {key: ['"西"', '"applepay"', 9], value: 0},
         ];
         dateArr.forEach(item => {
             const result = expression(`FIND(${item.key[0]}, ${item.key[1]}, ${item.key[2]})`);
