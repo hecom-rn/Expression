@@ -14,15 +14,21 @@ interface Config {
 }
 
 let defConfig: Config = {};
+let defThousandFun = null;
 
 export default {
     calculate: _calculate,
     analyze: _analyze,
     setConfig,
+    setThousandFun
 };
 
 function setConfig(config: Config) {
     Object.assign(defConfig, config);
+};
+
+function setThousandFun(thousandFun: Function) {
+    defThousandFun = thousandFun;
 }
 
 /**
@@ -186,7 +192,9 @@ const _DefaultExpressionFuncs = {
     TIMEDIF, DATEDIF, TODAY, NOW, DATEOFFSET, TIMEOFFSET,
     AND, OR, IF, TRUE, FALSE, CASE, NULL,
     LEFT, RIGHT, SEARCH, CONCATENATE, TEXT,
-    CURRENT_USER, CURRENT_ORG, TO_CAPITAL_RMB
+    CURRENT_USER, CURRENT_ORG, TO_CAPITAL_RMB, DAY, MONTH,
+    YEAR, DATE, THOUSANDSEP, MAX, MIN, TOCAPITAL, FIND,
+    TONUMBER, MID, ID_TO_AGE, DATEVALUE
 };
 
 function ABS(number) {
@@ -430,4 +438,254 @@ function TO_CAPITAL_RMB(money) {
     } catch (e) {
         return '';
     }
+}
+
+
+function DAY(date) {
+    if (date === undefined || date === '' || date === null) {
+        return '';
+    }
+    const time = _dateFromAny(date);
+    const day = time ? time.getDate() : '';
+    return (day > 0) ? day : '';
+}
+
+function MONTH(date) {
+    if (date === undefined || date === '' || date === null) {
+        return '';
+    }
+    const time = _dateFromAny(date);
+    const month = time ? (time.getMonth() + 1) : '';
+    return (month > 0) ? month : '';
+}
+
+function YEAR(date) {
+    if (date === undefined || date === '' || date === null) {
+        return '';
+    }
+    const time = _dateFromAny(date);
+    const year = time ? time.getFullYear() : '';
+    return (year > 0) ? year : '';
+}
+
+function DATE(year, month, day) {
+    const item = [{'key': year}, {'key': month}, {'key': day}];
+    const result = item.filter(i => (i.key === undefined || i.key === '' || i.key === null || isNaN(i.key)));
+    if (result.length > 0) {
+        return 0;
+    }
+    try {
+        const date = new Date(Date.parse(year + '-' + month + '-' + day));
+        return date.getTime();
+    } catch (e) {
+        throw 'error';
+    }
+}
+
+function THOUSANDSEP(number) {
+    if (number === undefined || number === '' || number === null || isNaN(number)) {
+        return '';
+    }
+    if (!defThousandFun) return '';
+    return defThousandFun(number);
+}
+
+
+
+
+function MAX(...args: any[]) {
+    let max = '';
+    try {
+        if (!args || (args && args.length === 0)) {
+            return '';
+        }
+        const numArr = args.filter(item => !isNaN(item));
+        if (numArr.length === 0) {
+            throw 'error';
+        }
+        max = Math.max.apply(null, numArr);
+    } catch (e) {
+        return '';
+    }
+    return max;
+}
+
+
+function MIN(...args: any[]) {
+    let min = '';
+    try {
+        if (args && args.length === 0) {
+            return '';
+        }
+        const numArr = args.filter(item => !isNaN(item));
+        if (numArr.length === 0) {
+            throw 'error';
+        }
+        min = Math.min.apply(null, numArr);
+    } catch (e) {
+        return '';
+    }
+    return min;
+}
+
+function TOCAPITAL(number) {
+    if (number === undefined || number === null || number === '') {
+        return '';
+    }
+
+    try {
+        if (isNaN(number)) {
+            return '';
+        }
+
+        const digit = [
+            '零', '壹', '贰', '叁', '肆',
+            '伍', '陆', '柒', '捌', '玖'
+        ];
+        const unit = [
+            ['', '万', '亿'],
+            ['', '拾', '佰', '仟']
+        ];
+        const head = number < 0 ? '负' : '';
+        const splitArr = number.toString().split('.');
+
+        let integerNum = null;
+        let decimalNum = null;
+        let integerChinese = '';
+        let decimalChinese = '';
+        if (splitArr.length > 2) {
+            return '';
+        } else if (splitArr.length === 2) {
+            integerNum = splitArr[0];
+            decimalNum = splitArr[1];
+        } else {
+            integerNum = splitArr[0];
+        }
+
+        if (Math.abs(number) >= 1) {
+            for (let i = 0; i < unit[0].length && integerNum > 0; i++) {
+                let cycle = '';
+                for (let j = 0; j < unit[1].length && integerNum > 0; j++) {
+                    cycle = digit[integerNum % 10] + unit[1][j] + cycle;
+                    integerNum = Math.floor(integerNum / 10);
+                }
+                integerChinese = cycle.replace(/(零.)*零$/, '').replace(/^$/, '零') + unit[0][i] + integerChinese;
+            }
+        } else {
+            integerChinese = '零';
+        }
+
+        if (decimalNum) {
+            const digitMap = {0: '零', 1: '壹', 2: '贰', 3: '叁', 4: '肆', 5: '伍', 6: '陆', 7: '柒', 8: '捌', 9: '玖'};
+            decimalNum.split('').forEach(item => {
+                decimalChinese = decimalChinese + digitMap[item];
+            });
+        }
+        let dot = '';
+        if (decimalChinese !== '') {
+            dot = '点';
+        }
+        return head + integerChinese + dot + decimalChinese;
+    } catch (e) {
+        return '';
+    }
+}
+
+function FIND(targetText, text, startPoint) {
+    const item = [{'key': targetText}, {'key': text}, {'key': startPoint}];
+    const result = item.filter(i => (i.key === undefined || i.key === '' || i.key === null));
+    if (result.length > 0) {
+        return 0;
+    }
+    targetText = targetText.toString();
+    text = text.toString();
+    if (startPoint > text.length) {
+        return 0;
+    }
+    const subStrtext = text.substring(startPoint, text.length);
+    if (subStrtext.indexOf(targetText) === -1) {
+        return 0;
+    }
+    return startPoint + subStrtext.indexOf(targetText);
+}
+
+function TONUMBER(strNum) {
+    if (strNum === undefined || strNum === '' || strNum === null || isNaN(strNum)) {
+        return '';
+    }
+    let num = Number(strNum);
+    return num;
+}
+
+
+function MID(text, startPoint, length) {
+    const item = [{'key': text}, {'key': startPoint}, {'key': length}];
+    const result = item.filter(i => (i.key === undefined || i.key === '' || i.key === null));
+    if (result.length > 0) {
+        return '';
+    }
+    if (startPoint > text.length || text.length < startPoint + length) {
+        return '';
+    }
+    const midStr = text.slice(startPoint, startPoint + length);
+    return midStr;
+}
+
+function ID_TO_AGE(idCard) {
+    if (idCard === undefined || idCard === '' || idCard === null) {
+        return '';
+    }
+    idCard = idCard.toString();
+    const len = idCard.length;
+    if (!(len === 15 || len === 18)) {
+        return '';
+    }
+    const birth = idCard.length === 18 ? idCard.slice(6, 14) : idCard.slice(6, 12);
+    let year, month, day;
+    if (birth.length === 8) {
+        year = parseInt(birth.slice(0, 4), 10);
+        month = parseInt(birth.slice(4, 6), 10);
+        day = parseInt(birth.slice(-2), 10)
+    } else if (birth.length === 6) {
+        year = parseInt('19' + birth.slice(0, 2), 10);
+        month = parseInt(birth.slice(2, 4), 10);
+        day = parseInt(birth.slice(-2), 10);
+    } else {
+        return '';
+    }
+    if (isNaN(month) || isNaN(day) || month > 12 || month === 0 || day > 31 || day === 0) {
+        return '';
+    }
+    const date = new Date();
+    const currentTimestamp = date.getTime();
+
+    const currentYear = date.getFullYear();
+    const birthDay = currentYear + '-' + `${month}-${day}`;
+    const birthdayTimestamp = new Date(birthDay).getTime();
+    let old = 0;
+    if ((currentYear - year) > 0) {
+        old = currentYear - year;
+        ((birthdayTimestamp - currentTimestamp) < 0) && (old = old + 1)
+    }
+    return old;
+}
+
+function DATEVALUE(text) {
+    if (text === undefined || text === '' || text === null) {
+        return '';
+    }
+    const result = _dateFromAny(text);
+    if (isNaN(result)) {
+        return '';
+    }
+    try {
+        const time = new Date(result.getTime());
+        const year = time.getFullYear();
+        const month = time.getMonth() + 1;
+        const day = time.getDate();
+        return year + '年' + month + '月' + day + '日';
+    } catch (e) {
+        return '';
+    }
+
 }
