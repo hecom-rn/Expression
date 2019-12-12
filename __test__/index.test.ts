@@ -146,8 +146,8 @@ describe('formula', () => {
 
     test('DATE', () => {
         const dateArr = [
-            {key: [2019, 12, 1], value: 1575129600000},
-            {key: [1990, 1, 1], value: 631123200000},
+            {key: [2019, 12, 1], value: new Date('2019-12-1').getTime()},
+            {key: [1990, 1, 1], value: new Date('1990-1-1').getTime()},
             {key: ['"异常测试"', '"嘻嘻"', '"哈哈"'], value: 0},
             {key: [undefined, 9, 27], value: 0},
             {key: [9012, '""', 27], value: 0},
