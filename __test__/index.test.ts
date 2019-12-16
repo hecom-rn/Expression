@@ -144,7 +144,7 @@ describe('formula', () => {
         });
     });
 
-    test('DATE', () => {
+    test('TODATE', () => {
         const dateArr = [
             {key: [2019, 12, 1], value: new Date('2019-12-1').getTime()},
             {key: [1990, 1, 1], value: new Date('1990-1-1').getTime()},
@@ -154,7 +154,7 @@ describe('formula', () => {
             {key: [9876, 9, null], value: 0},
         ];
         dateArr.forEach(item => {
-            const result = expression(`DATE(${item.key[0]}, ${item.key[1]}, ${item.key[2]})`);
+            const result = expression(`TODATE(${item.key[0]}, ${item.key[1]}, ${item.key[2]})`);
             expect(result).toBe(item.value);
         });
     });

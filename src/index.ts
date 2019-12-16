@@ -193,7 +193,7 @@ const _DefaultExpressionFuncs = {
     AND, OR, IF, TRUE, FALSE, CASE, NULL,
     LEFT, RIGHT, SEARCH, CONCATENATE, TEXT,
     CURRENT_USER, CURRENT_ORG, TO_CAPITAL_RMB, DAY, MONTH,
-    YEAR, DATE, THOUSANDSEP, MAX, MIN, TOCAPITAL, FIND,
+    YEAR, TODATE, THOUSANDSEP, MAX, MIN, TOCAPITAL, FIND,
     TONUMBER, MID, ID_TO_AGE, DATEVALUE
 };
 
@@ -468,7 +468,7 @@ function YEAR(date) {
     return (year > 0) ? year : '';
 }
 
-function DATE(year, month, day) {
+function TODATE(year, month, day) {
     const item = [{'key': year}, {'key': month}, {'key': day}];
     const result = item.filter(i => (i.key === undefined || i.key === '' || i.key === null || isNaN(i.key)));
     if (result.length > 0) {
@@ -489,8 +489,6 @@ function THOUSANDSEP(number) {
     if (!defThousandFun) return '';
     return defThousandFun(number);
 }
-
-
 
 
 function MAX(...args: any[]) {
