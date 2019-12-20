@@ -194,7 +194,7 @@ const _DefaultExpressionFuncs = {
     LEFT, RIGHT, SEARCH, CONCATENATE, TEXT,
     CURRENT_USER, CURRENT_ORG, TO_CAPITAL_RMB, DAY, MONTH,
     YEAR, TODATE, THOUSANDSEP, MAX, MIN, TOCAPITAL, FIND,
-    TONUMBER, MID, ID_TO_AGE, DATEVALUE
+    TONUMBER, SLICE, ID_TO_AGE, DATEVALUE
 };
 
 function ABS(number) {
@@ -616,7 +616,7 @@ function TONUMBER(strNum) {
 }
 
 
-function MID(text, startPoint, length) {
+function SLICE(text, startPoint, length) {
     const item = [{'key': text}, {'key': startPoint}, {'key': length}];
     const result = item.filter(i => (i.key === undefined || i.key === '' || i.key === null));
     if (result.length > 0) {
