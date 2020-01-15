@@ -246,7 +246,7 @@ describe('formula', () => {
         });
     });
 
-    test('MID', () => {
+    test('SLICE', () => {
         const dateArr = [
             {key: ['"tomorrow"', 3, 2], value: 'or'},
             {key: ['"tomorrow"', 7, 2], value: ''},
@@ -254,15 +254,15 @@ describe('formula', () => {
             {key: ['"异常测试"', 9, 2], value: ''},
         ];
         dateArr.forEach(item => {
-            const result = expression(`MID(${item.key[0]}, ${item.key[1]}, ${item.key[2]})`);
+            const result = expression(`SLICE(${item.key[0]}, ${item.key[1]}, ${item.key[2]})`);
             expect(result).toBe(item.value);
         });
     });
 
-    test('ID_TO_AGE', () => {
+    test('ID_TO_AGE', () => { //这个期望的值和当前的时间有关系，随着时间的推移，期望的值会越来越大
         const dateArr = [
-            {key: 422324199610271952, value: 24},
-            {key: 632123820927051, value: 38},
+            {key: 422324199610271952, value: 23},
+            {key: 110102199209081234, value: 27},
             {key: 4223241991082719987, value: ''},
         ];
         dateArr.forEach(item => {

@@ -662,8 +662,8 @@ function ID_TO_AGE(idCard) {
     const birthdayTimestamp = new Date(birthDay).getTime();
     let old = 0;
     if ((currentYear - year) > 0) {
-        old = currentYear - year;
-        ((birthdayTimestamp - currentTimestamp) < 0) && (old = old + 1)
+        ((birthdayTimestamp < currentTimestamp)) ? (old = currentYear - year) :
+            (old = currentYear - year - 1)
     }
     return old;
 }
