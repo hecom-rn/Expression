@@ -476,7 +476,10 @@ function TODATE(year, month, day) {
     }
     try {
         const date = new Date(Date.parse(year + '-' + month + '-' + day));
-        return date.getTime();
+        const result = date.getTime();
+        if (result > 0) {
+            return result;
+        }
     } catch (e) {
         throw 'error';
     }
