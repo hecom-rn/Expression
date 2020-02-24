@@ -36,8 +36,9 @@ function setThousandFun(thousandFun: Function) {
  * @param exprStr 表达式，必须是"${...}"格式
  * @param fieldnames 表达式中应该包含哪些字段名称，不传的话，则所有不是函数的都是字段名称
  * @param data 业务对象的数据
+ * @param useNull 使用null代替undefined的计算结果
  */
-function _calculate(exprStr: string, fieldnames?: string[], data?): any {
+function _calculate(exprStr: string, fieldnames?: string[], data?, {useNull}): any {
     const expr = exprStr.slice(2, exprStr.length - 1);
     let result; // eslint-disable-line init-declarations
     try {
@@ -48,6 +49,9 @@ function _calculate(exprStr: string, fieldnames?: string[], data?): any {
         });
         script = script + 'result = ' + expr + ';';
         eval(script);
+        if (useNull && result === undefined) {
+            result = null;
+        }
     } catch (error) {
         console.warn('Expression', expr, 'is error with fields', JSON.stringify(fieldnames), 'with data', JSON.stringify(data) + '.');
     }
