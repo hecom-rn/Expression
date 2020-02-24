@@ -38,7 +38,7 @@ function setThousandFun(thousandFun: Function) {
  * @param data 业务对象的数据
  * @param useNull 使用null代替undefined的计算结果
  */
-function _calculate(exprStr: string, fieldnames?: string[], data?, {useNull}): any {
+function _calculate(exprStr: string, fieldnames?: string[], data?, {useNull = false} = {}): any {
     const expr = exprStr.slice(2, exprStr.length - 1);
     let result; // eslint-disable-line init-declarations
     try {
