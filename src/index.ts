@@ -278,13 +278,13 @@ function DATEDIF(startDateTimestamp, endDateTimestamp, unit) {
 function TODAY() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return today.now();
+    return today.getTime();
 }
 
 function NOW() {
     const now = new Date();
     now.setMilliseconds(0);
-    return now.now();
+    return now.getTime();
 }
 
 function TIMEOFFSET(startTimestamp, unit, value) {

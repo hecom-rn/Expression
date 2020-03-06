@@ -105,6 +105,16 @@ describe('formula', () => {
         });
     });
 
+    test('TODAY', () => {
+        const result = expression(`TODAY()`);
+        expect(result).toInclude('00000');
+    });
+
+    test('NOW', () => {
+        const result = expression(`NOW()`);
+        expect(result).toInclude('000');
+    });
+
     test('DAY', () => {
         const dateArr = [
             {key: '"2019-10-10"', value: 10},
