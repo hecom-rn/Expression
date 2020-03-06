@@ -276,11 +276,15 @@ function DATEDIF(startDateTimestamp, endDateTimestamp, unit) {
 }
 
 function TODAY() {
-    return Date.now();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today.now();
 }
 
 function NOW() {
-    return Date.now();
+    const now = new Date();
+    now.setMilliseconds(0);
+    return now.now();
 }
 
 function TIMEOFFSET(startTimestamp, unit, value) {
