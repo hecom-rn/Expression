@@ -107,12 +107,12 @@ describe('formula', () => {
 
     test('TODAY', () => {
         const result = expression(`TODAY()`);
-        expect(result).toInclude('00000');
+        expect(Math.ceil(result / 1000) * 1000).toBe(result);
     });
 
     test('NOW', () => {
         const result = expression(`NOW()`);
-        expect(result).toInclude('000');
+        expect(Math.ceil(result / 1000) * 1000).toBe(result);
     });
 
     test('DAY', () => {
