@@ -25,7 +25,7 @@ export default {
 
 function setConfig(config: Config) {
     Object.assign(defConfig, config);
-};
+}
 
 function setThousandFun(thousandFun: Function) {
     defThousandFun = thousandFun;
@@ -37,23 +37,22 @@ function setThousandFun(thousandFun: Function) {
  * @param fieldnames 表达式中应该包含哪些字段名称，不传的话，则所有不是函数的都是字段名称
  * @param data 业务对象的数据
  * @param useNull 使用null代替undefined的计算结果
+ * @param throwException 计算失败时是否抛出异常
  */
-function _calculate(exprStr: string, fieldnames?: string[], data?, {useNull = false} = {}): any {
+function _calculate(exprStr: string, fieldnames?: string[], data?, {useNull = false, throwException = false} = {}): any {
     const expr = exprStr.slice(2, exprStr.length - 1);
-    let result; // eslint-disable-line init-declarations
+    let result;
     try {
-        const fields = _analyze(exprStr, fieldnames);
-        let script = 'var bizData = {};';
-        fields.forEach(function (fieldname) {
-            script = script + 'bizData.' + fieldname[1] + '=' + JSON.stringify(data[fieldname[1]]) + ';';
-        });
-        script = script + 'result = ' + expr + ';';
-        eval(script);
+        const bizData = Object.assign({}, data);
+        eval('result = ' + expr + ';');
         if (useNull && result === undefined) {
             result = null;
         }
     } catch (error) {
-        console.warn('Expression', expr, 'is error with fields', JSON.stringify(fieldnames), 'with data', JSON.stringify(data) + '.');
+        console.warn(`表达式：${exprStr} 计算失败`, error);
+        if (throwException) {
+            throw error
+        }
     }
     return result;
 }
@@ -192,14 +191,24 @@ function _analyze(exprStr: string, fieldnames: string[]): AnalyzeResult[] {
 }
 
 const _DefaultExpressionFuncs = {
-    ABS, CEILING, FLOOR, LN, LOG, MOD, ROUND, SQRT,
-    TIMEDIF, DATEDIF, TODAY, NOW, DATEOFFSET, TIMEOFFSET,
-    AND, OR, IF, TRUE, FALSE, CASE, NULL,
-    LEFT, RIGHT, SEARCH, CONCATENATE, TEXT,
-    CURRENT_USER, CURRENT_ORG, TO_CAPITAL_RMB, DAY, MONTH,
-    YEAR, TODATE, THOUSANDSEP, MAX, MIN, TOCAPITAL, FIND,
-    TONUMBER, SLICE, ID_TO_AGE, DATEVALUE
+    // 数学函数
+    ABS, CEILING, FLOOR, LN, LOG, MOD, ROUND, SQRT, THOUSANDSEP, MAX, MIN,
+    // 时间函数
+    TIMEDIF, DATEDIF, TODAY, NOW, DATEOFFSET, TIMEOFFSET, DAY, MONTH, YEAR, TODATE, DATEVALUE,
+    // 逻辑函数
+    AND, OR, IF, TRUE, FALSE, CASE, NULL, ISNOTNULL, ISNULL,
+    // 文本函数
+    LEFT, RIGHT, SEARCH, CONCATENATE, TEXT, TOCAPITAL, TO_CAPITAL_RMB, FIND, SLICE, ID_TO_AGE, TONUMBER,
+    CURRENT_USER, CURRENT_ORG,
 };
+
+function ISNOTNULL(value) {
+    return !(value === null);
+}
+
+function ISNULL(value) {
+    return value === null;
+}
 
 function ABS(number) {
     return Math.abs(number);
@@ -357,16 +366,23 @@ function NULL() {
     return null;
 }
 
-function LEFT(fieldId, numberChars) {
-    return fieldId.substring(0, numberChars);
+function LEFT(str, numberChars) {
+    if (isNaN(numberChars)) {
+        throw new Error('numberChars: ' + numberChars + ' 必须是一个数值')
+    }
+    return str.toString().substring(0, numberChars);
 }
 
-function RIGHT(fieldId, numberChars) {
-    return fieldId.substring(fieldId.length - numberChars, fieldId.length);
+function RIGHT(str, numberChars) {
+    if (isNaN(numberChars)) {
+        throw new Error('numberChars: ' + numberChars + ' 必须是一个数值')
+    }
+    str = str.toString();
+    return str.substring(str.length - numberChars, str.length);
 }
 
-function SEARCH(fieldId, keyword) {
-    return fieldId.indexOf(keyword) !== -1;
+function SEARCH(str, keyword) {
+    return str.toString().indexOf(keyword.toString()) !== -1;
 }
 
 function CONCATENATE() {
@@ -374,7 +390,7 @@ function CONCATENATE() {
 }
 
 function TEXT(value) {
-    return '' + value;
+    return value.toString();
 }
 
 function CURRENT_USER() {
@@ -503,38 +519,28 @@ function THOUSANDSEP(number) {
 
 
 function MAX(...args: any[]) {
-    let max = '';
-    try {
-        if (!args || (args && args.length === 0)) {
-            return '';
-        }
-        const numArr = args.filter(item => !isNaN(item));
-        if (numArr.length === 0) {
-            throw 'error';
-        }
-        max = Math.max.apply(null, numArr);
-    } catch (e) {
-        return '';
+    if (Array.isArray(args) && args.length === 0) {
+        throw new Error('缺少参数')
     }
-    return max;
+    // isNaN(null)的结果为false，Math.min函数认为null=0
+    const numArr = args.filter(item => !isNaN(item) && item !== null);
+    if (numArr.length === 0) {
+        throw new Error('必须至少包含一个数值类型的参数');
+    }
+    return Math.max(...numArr);
 }
 
 
 function MIN(...args: any[]) {
-    let min = '';
-    try {
-        if (args && args.length === 0) {
-            return '';
-        }
-        const numArr = args.filter(item => !isNaN(item));
-        if (numArr.length === 0) {
-            throw 'error';
-        }
-        min = Math.min.apply(null, numArr);
-    } catch (e) {
-        return '';
+    if (Array.isArray(args) && args.length === 0) {
+        throw new Error('缺少参数')
     }
-    return min;
+    // isNaN(null)的结果为false，Math.min函数认为null=0
+    const numArr = args.filter(item => !isNaN(item) && item !== null);
+    if (numArr.length === 0) {
+        throw new Error('必须至少包含一个数值类型的参数');
+    }
+    return Math.min(...numArr);
 }
 
 function TOCAPITAL(number) {
@@ -622,12 +628,12 @@ function TONUMBER(strNum) {
     if (strNum === undefined || strNum === '' || strNum === null || isNaN(strNum)) {
         return '';
     }
-    let num = Number(strNum);
-    return num;
+    return Number(strNum);
 }
 
 
 function SLICE(text, startPoint, length) {
+    text = text.toString();
     const item = [{'key': text}, {'key': startPoint}, {'key': length}];
     const result = item.filter(i => (i.key === undefined || i.key === '' || i.key === null));
     if (result.length > 0) {
@@ -636,8 +642,7 @@ function SLICE(text, startPoint, length) {
     if (startPoint > text.length || text.length < startPoint + length) {
         return '';
     }
-    const midStr = text.slice(startPoint, startPoint + length);
-    return midStr;
+    return text.slice(startPoint, startPoint + length);
 }
 
 function ID_TO_AGE(idCard) {

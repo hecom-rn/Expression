@@ -4,6 +4,21 @@ function expression(content: string, data?: any, fieldNames?: any) {
     return Expression.calculate('${' + content + '}', fieldNames, data);
 }
 
+class Proxy {
+    __key__: string;
+
+    constructor(obj: object, key: string) {
+        Object.keys(obj).forEach(key => {
+            this[key] = obj[key];
+        });
+        this.__key__ = key;
+    }
+
+    toString() {
+        return this[this.__key__]
+    }
+}
+
 /**
  * 函数相关的表达式测试用例
  */
@@ -64,6 +79,25 @@ describe('formula', () => {
     });
     test('OR', () => {
         const result = expression(`OR(true,FALSE())`);
+        expect(result).toBeTruthy();
+    });
+
+    test('ISNOTNULL', () => {
+        const params = [true, '', undefined, 12];
+        params.forEach(item => {
+            const result = expression(`ISNOTNULL(${item})`);
+            expect(result).toBeTruthy();
+        });
+        const result = expression(`ISNOTNULL(null)`);
+        expect(result).toBeFalsy();
+    });
+    test('ISNULL', () => {
+        const params = [true, '', undefined, 12];
+        params.forEach(item => {
+            const result = expression(`ISNULL(${item})`);
+            expect(result).toBeFalsy();
+        });
+        const result = expression(`ISNULL(null)`);
         expect(result).toBeTruthy();
     });
 
@@ -172,8 +206,7 @@ describe('formula', () => {
     test('THOUSANDSEP', () => {
         Expression.setThousandFun((num) => {
             num = Math.round(num);
-            let formatNum = (num + '').replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g, '$1,');
-            return formatNum;
+            return (num + '').replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g, '$1,');
         });
 
         const dateArr = [
@@ -194,28 +227,47 @@ describe('formula', () => {
         const dateArr = [
             {key: [-23, -45, -90, -61235, -3214, -6123599], value: -23},
             {key: [23, 45, 90, 61235, 0, 3214, -6123599], value: 61235},
-            {key: [23, 45, 90, 61235, 0, 3214, 61235], value: 61235},
-            {key: [23, 45, 90, 61235, 0, 3214, ''], value: 61235},
+            {key: [23, 45, 90, 61235, 0, 'undefined', 61235], value: 61235},
+            {key: [-23, -45, -90, -61235, -3214, 'null'], value: -23},
             {key: [23, 45, 90, 61235, 0, 3214, '"异常测试"'], value: 61235},
-            {key: [], value: ''},
         ];
         dateArr.forEach(item => {
             const result = expression(`MAX(${item.key})`);
             expect(result).toBe(item.value);
         });
+        try {
+            expression(`MAX()`);
+        } catch (e) {
+            expect(e.message).toBe('缺少参数');
+        }
+        try {
+            expression(`MAX(null, '123')`);
+        } catch (e) {
+            expect(e.message).toBe('必须至少包含一个数值类型的参数');
+        }
     });
 
     test('MIN', () => {
         const dateArr = [
             {key: [23, 45, 90, 61235, 0, 3214], value: 0},
-            {key: [23, 45, 90, 61235, 0, 3214, -1], value: -1},
-            {key: [23, 45, 90, 61235, 3214, 0.9], value: 0.9},
-            {key: [23, 45, 90, 61235, 0, 3214, -2], value: -2},
+            {key: [23, 45, 90, '"字符串"', 0, 3214, -1], value: -1},
+            {key: [23, 45, 'null', 61235, 3214, 0.9], value: 0.9},
+            {key: [23, 45, 90, 'undefined', 0, 3214, -2], value: -2},
         ];
         dateArr.forEach(item => {
             const result = expression(`MIN(${item.key})`);
             expect(result).toBe(item.value);
         });
+        try {
+            expression(`MIN()`);
+        } catch (e) {
+            expect(e.message).toBe('缺少参数');
+        }
+        try {
+            expression(`MIN(null, '123')`);
+        } catch (e) {
+            expect(e.message).toBe('必须至少包含一个数值类型的参数');
+        }
     });
 
     test('TOCAPITAL', () => {
@@ -254,6 +306,46 @@ describe('formula', () => {
             const result = expression(`TONUMBER(${item.key})`);
             expect(result).toBe(item.value);
         });
+    });
+
+    test('LEFT', () => {
+        const params = [
+            {item: 123456, length: 3, value: '123'},
+            {item: '123456', length: 3, value: '123'},
+            {item: new Proxy({label: 'abcdefg'}, 'label'), length: 3, value: 'abc'},
+        ];
+        params.forEach(({item, length, value}) => {
+            const result = expression(`LEFT(bizData.item, ${length})`, {item});
+            expect(result).toBe(value)
+        })
+    });
+    test('RIGHT', () => {
+        const params = [
+            {item: 123456, length: 3, value: '456'},
+            {item: '123456', length: 3, value: '456'},
+            {item: new Proxy({label: 'abcdefg'}, 'label'), length: 3, value: 'efg'},
+        ];
+        params.forEach(({item, length, value}) => {
+            const result = expression(`RIGHT(bizData.item, ${length})`, {item});
+            expect(result).toBe(value)
+        })
+    });
+    test('SEARCH', () => {
+        const params = [
+            {item: 123456, key: '456', value: true},
+            {item: '123456', key: '456', value: true},
+            {item: new Proxy({label: 'abcdefg'}, 'label'), key: 'efg', value: true},
+            {item: new Proxy({label: 'abcdefg'}, 'label'), key: 'bac', value: false},
+            {item: new Proxy({label: 'abcdefg'}, 'label'), key: new Proxy({key: 'efg'}, 'key'), value: true},
+        ];
+        params.forEach(({item, key, value}) => {
+            const result = expression(`SEARCH(bizData.item, bizData.key)`, {item, key});
+            if (value) {
+                expect(result).toBeTruthy();
+            } else {
+                expect(result).toBeFalsy();
+            }
+        })
     });
 
     test('SLICE', () => {
