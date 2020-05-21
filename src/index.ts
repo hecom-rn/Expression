@@ -17,13 +17,6 @@ interface Config {
 let defConfig: Config = {};
 let defThousandFun = null;
 
-export default {
-    calculate: _calculate,
-    analyze: _analyze,
-    setConfig,
-    setThousandFun
-};
-
 function setConfig(config: Config) {
     Object.assign(defConfig, config);
 }
@@ -708,3 +701,11 @@ function DATEVALUE(text) {
     }
 
 }
+
+export default {
+    calculate: _calculate,
+    analyze: _analyze,
+    setConfig,
+    setThousandFun,
+    funcMap: _DefaultExpressionFuncs
+};
