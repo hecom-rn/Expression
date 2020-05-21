@@ -11,6 +11,7 @@ interface User {
 
 interface Config {
     currentUser?: () => User
+    eval?: (expr: string, bizData: object) => any
 }
 
 let defConfig: Config = {};
@@ -44,7 +45,11 @@ function _calculate(exprStr: string, fieldnames?: string[], data?, {useNull = fa
     let result;
     try {
         const bizData = Object.assign({}, data);
-        eval('result = ' + expr + ';');
+        if (defConfig.eval) {
+            result = defConfig.eval(expr, bizData)
+        } else {
+            result = eval(expr);
+        }
         if (useNull && result === undefined) {
             result = null;
         }
