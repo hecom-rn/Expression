@@ -12,6 +12,7 @@ interface User {
 interface Config {
     currentUser?: () => User
     eval?: (expr: string, bizData: object) => any
+    superiors?: () => User
 }
 
 let defConfig: Config = {};
@@ -197,7 +198,7 @@ const _DefaultExpressionFuncs = {
     AND, OR, IF, TRUE, FALSE, CASE, NULL, ISNOTNULL, ISNULL,
     // 文本函数
     LEFT, RIGHT, SEARCH, CONCATENATE, TEXT, TOCAPITAL, TO_CAPITAL_RMB, FIND, SLICE, ID_TO_AGE, TONUMBER,
-    CURRENT_USER, CURRENT_ORG,
+    CURRENT_USER, CURRENT_ORG, CURRENT_OWNER
 };
 
 function ISNOTNULL(value) {
@@ -699,7 +700,15 @@ function DATEVALUE(text) {
     } catch (e) {
         return '';
     }
+}
 
+function CURRENT_OWNER() {
+    if (!defConfig.superiors) return;
+    const user = defConfig.superiors();
+    return {
+        code: user.code,
+        name: user.name,
+    };
 }
 
 export default {
