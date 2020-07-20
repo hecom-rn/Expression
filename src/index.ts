@@ -466,29 +466,29 @@ function TO_CAPITAL_RMB(money) {
 
 function DAY(date) {
     if (date === undefined || date === '' || date === null) {
-        return '';
+        return undefined;
     }
     const time = _dateFromAny(date);
-    const day = time ? time.getDate() : '';
-    return (day > 0) ? day : '';
+    const day = time ? time.getDate() : undefined;
+    return (day > 0) ? day : undefined;
 }
 
 function MONTH(date) {
     if (date === undefined || date === '' || date === null) {
-        return '';
+        return undefined;
     }
     const time = _dateFromAny(date);
-    const month = time ? (time.getMonth() + 1) : '';
-    return (month > 0) ? month : '';
+    const month = time ? (time.getMonth() + 1) : undefined;
+    return (month > 0) ? month : undefined;
 }
 
-function YEAR(date) {
+function YEAR(date: string | number | Date): number | undefined {
     if (date === undefined || date === '' || date === null) {
-        return '';
+        return undefined;
     }
     const time = _dateFromAny(date);
-    const year = time ? time.getFullYear() : '';
-    return (year > 0) ? year : '';
+    const year = time ? time.getFullYear() : undefined;
+    return (year > 0) ? year : undefined;
 }
 
 function TODATE(year, month, day) {
