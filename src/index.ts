@@ -3,7 +3,7 @@ export type AnalyzeResult = string[];
 interface User {
     code: string
     name: string
-    dept: {
+    dept?: {
         code: string
         name: string
     }
@@ -410,7 +410,7 @@ function CURRENT_ORG() {
     };
 }
 
-function _dateFromAny(obj) {
+function _dateFromAny(obj: string | number | Date): Date {
     if (typeof obj === 'string') {
         const times = obj.split(/[ :/-]/, 6).map(item => Number(item));
         return new Date(times[0], times[1] - 1 || 0, times[2] || 1, times[3] || 0, times[4] || 0, times[5] || 0);
@@ -517,7 +517,7 @@ function THOUSANDSEP(number) {
 }
 
 
-function MAX(...args: any[]) {
+function MAX(...args: any[]): number {
     if (Array.isArray(args) && args.length === 0) {
         throw new Error('缺少参数')
     }
@@ -530,7 +530,7 @@ function MAX(...args: any[]) {
 }
 
 
-function MIN(...args: any[]) {
+function MIN(...args: any[]): number {
     if (Array.isArray(args) && args.length === 0) {
         throw new Error('缺少参数')
     }
@@ -542,7 +542,7 @@ function MIN(...args: any[]) {
     return Math.min(...numArr);
 }
 
-function TOCAPITAL(number) {
+function TOCAPITAL(number): string {
     if (number === undefined || number === null || number === '') {
         return '';
     }
@@ -605,7 +605,15 @@ function TOCAPITAL(number) {
     }
 }
 
-function FIND(targetText, text, startPoint) {
+/**
+ * 返回{@param text}中，从{@param startPoint}开始的第一个{@param targetText}的位置
+ * @param targetText 目标字符串
+ * @param text 原始字符串
+ * @param startPoint 起始位置
+ * @constructor
+ * @return 位置下标，从0开始，未找到返回-1
+ */
+function FIND(targetText: string, text: string, startPoint: number): number {
     const item = [{'key': targetText}, {'key': text}, {'key': startPoint}];
     const result = item.filter(i => (i.key === undefined || i.key === '' || i.key === null));
     if (result.length > 0) {
@@ -623,15 +631,21 @@ function FIND(targetText, text, startPoint) {
     return startPoint + subStrtext.indexOf(targetText);
 }
 
-function TONUMBER(strNum) {
-    if (strNum === undefined || strNum === '' || strNum === null || isNaN(strNum)) {
-        return '';
+/**
+ * 将strNum转化为数字
+ * @param strNum
+ * @constructor
+ */
+function TONUMBER(strNum: string): number {
+    if (strNum === undefined || strNum === '' || strNum === null) {
+        return 0;
     }
-    return Number(strNum);
+    const result = Number(strNum);
+    return isNaN(result) ? 0 : result;
 }
 
 
-function SLICE(text, startPoint, length) {
+function SLICE(text: string, startPoint: number, length: number): string {
     text = text.toString();
     const item = [{'key': text}, {'key': startPoint}, {'key': length}];
     const result = item.filter(i => (i.key === undefined || i.key === '' || i.key === null));
@@ -644,14 +658,14 @@ function SLICE(text, startPoint, length) {
     return text.slice(startPoint, startPoint + length);
 }
 
-function ID_TO_AGE(idCard) {
+function ID_TO_AGE(idCard: string): number | undefined {
     if (idCard === undefined || idCard === '' || idCard === null) {
-        return '';
+        return undefined;
     }
     idCard = idCard.toString();
     const len = idCard.length;
     if (!(len === 15 || len === 18)) {
-        return '';
+        return undefined;
     }
     const birth = idCard.length === 18 ? idCard.slice(6, 14) : idCard.slice(6, 12);
     let year, month, day;
@@ -664,10 +678,10 @@ function ID_TO_AGE(idCard) {
         month = parseInt(birth.slice(2, 4), 10);
         day = parseInt(birth.slice(-2), 10);
     } else {
-        return '';
+        return undefined;
     }
     if (isNaN(month) || isNaN(day) || month > 12 || month === 0 || day > 31 || day === 0) {
-        return '';
+        return undefined;
     }
     const date = new Date();
     const currentTimestamp = date.getTime();
@@ -683,12 +697,12 @@ function ID_TO_AGE(idCard) {
     return old;
 }
 
-function DATEVALUE(text) {
+function DATEVALUE(text: string | number | Date): string {
     if (text === undefined || text === '' || text === null) {
         return '';
     }
     const result = _dateFromAny(text);
-    if (isNaN(result)) {
+    if (!result || isNaN(result.getTime())) {
         return '';
     }
     try {
@@ -702,7 +716,7 @@ function DATEVALUE(text) {
     }
 }
 
-function CURRENT_OWNER() {
+function CURRENT_OWNER(): User {
     if (!defConfig.superiors) return;
     const user = defConfig.superiors();
     return {
