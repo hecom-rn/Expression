@@ -42,7 +42,7 @@ function _calculate(exprStr: string, fieldnames?: string[], data?, {useNull = fa
         if (defConfig.eval) {
             result = defConfig.eval(expr, bizData)
         } else {
-            result = eval(expr);
+            eval('result = ' + expr);
         }
         if (useNull && result === undefined) {
             result = null;
