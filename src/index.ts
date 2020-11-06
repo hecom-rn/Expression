@@ -257,7 +257,12 @@ function DATEDIF(startDateTimestamp, endDateTimestamp, unit) {
     } else if (unit === 'M') {
         return endDate.getMonth() - startDate.getMonth() + (endDate.getFullYear() - startDate.getFullYear()) * 12;
     } else if (unit === 'D' || unit === 'd') {
-        return Math.floor((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
+        const result = (endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000);
+        if (result < 0) {
+            return -Math.floor(-result);
+        } else {
+            return Math.floor(result);
+        }
     } else if (unit === 'MD') {
         return endDate.getDate() - startDate.getDate();
     } else if (unit === 'YM') {
@@ -265,7 +270,12 @@ function DATEDIF(startDateTimestamp, endDateTimestamp, unit) {
     } else if (unit === 'YD') {
         startDate.setFullYear(1970);
         endDate.setFullYear(1970);
-        return Math.floor((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
+        const result = (endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000);
+        if (result < 0) {
+            return -Math.floor(-result);
+        } else {
+            return Math.floor(result);
+        }
     } else {
         return 0;
     }
