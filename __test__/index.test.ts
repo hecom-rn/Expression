@@ -261,8 +261,8 @@ describe('formula', () => {
 
     test('ID_TO_AGE', () => { //这个期望的值和当前的时间有关系，随着时间的推移，期望的值会越来越大
         const dateArr = [
-            {key: 422324199610271952, value: 23},
-            {key: 110102199209081234, value: 27},
+            {key: 422324199610271952, value: 24},
+            {key: 110102199209081234, value: 28},
             {key: 4223241991082719987, value: ''},
         ];
         dateArr.forEach(item => {
@@ -279,6 +279,25 @@ describe('formula', () => {
         dateArr.forEach(item => {
             const result = expression(`DATEVALUE(${item.key})`);
             expect(result).toBe(item.value);
+        });
+    });
+
+    test('DATEDIF', () => {
+        const testData = [
+            {startTime: 1604657236000, endTime: 1604830036000, unit: 'd', result: 2}, // 2020-11-06 18:07:16  2020-11-08 18:07:16
+            {startTime: 1604830036000, endTime: 1604837236000, unit: 'd', result: 0}, // 2020-11-08 18:07:16  2020-11-08 20:07:16
+            {startTime: 1604830036000, endTime: 1604657236000, unit: 'd', result: -2},//2020-11-08 18:07:16   2020-11-06 18:07:16
+            {startTime: 1604837236000, endTime: 1604830036000, unit: 'd', result: 0}, //2020-11-08 20:07:16   2020-11-08 18:07:16
+            {startTime: undefined, endTime: 1604830036000, unit: 'd', result: ''},     //undefined   2020-11-08 18:07:16
+            {startTime: 1604657236000, endTime: 1636193236000, unit: 'YD', result: 0},  // 2020-11-06 18:07:16  2021-11-06 18:07:16
+            {startTime: 1604657236000, endTime: 1578305236000, unit: 'YD', result: -304},  // 2020-11-06 18:07:16  2020-1-06 18:07:16
+            {startTime: 1601201236000, endTime: 2550737236000, unit: 'YD', result: 33}, // 2020-9-27 18:07:16  2050-10-30 18:07:16
+            {startTime: 1601201236000, endTime: undefined, unit: 'YD', result: ''}, // 2020-9-27 18:07:16  undefined
+        ];
+
+        testData.forEach(item => {
+            const result = expression(`DATEDIF(${item.startTime}, ${item.endTime}, "${item.unit}")`);
+            expect(result).toBe(item.result);
         });
     });
 });

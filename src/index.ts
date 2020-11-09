@@ -250,34 +250,41 @@ function TIMEDIF(startTime, endTime, unit) {
 }
 
 function DATEDIF(startDateTimestamp, endDateTimestamp, unit) {
-    const startDate = _dateFromAny(startDateTimestamp);
-    const endDate = _dateFromAny(endDateTimestamp);
-    if (unit === 'Y' || unit === 'y') {
-        return endDate.getFullYear() - startDate.getFullYear();
-    } else if (unit === 'M') {
-        return endDate.getMonth() - startDate.getMonth() + (endDate.getFullYear() - startDate.getFullYear()) * 12;
-    } else if (unit === 'D' || unit === 'd') {
-        const result = (endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000);
-        if (result < 0) {
-            return -Math.floor(-result);
+    const setDayIgnoreHour = function (time) {
+        time.setHours(0);
+        time.setMinutes(0);
+        time.setSeconds(0);
+        time.setMilliseconds(0);
+    };
+    try {
+        const startDate = _dateFromAny(startDateTimestamp);
+        const endDate = _dateFromAny(endDateTimestamp);
+        if (unit === 'Y' || unit === 'y') {
+            return endDate.getFullYear() - startDate.getFullYear();
+        } else if (unit === 'M') {
+            return endDate.getMonth() - startDate.getMonth() + (endDate.getFullYear() - startDate.getFullYear()) * 12;
+        } else if (unit === 'D' || unit === 'd') {
+            setDayIgnoreHour(startDate);
+            setDayIgnoreHour(endDate);
+            return (endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000);
+        } else if (unit === 'MD') {
+            return endDate.getDate() - startDate.getDate();
+        } else if (unit === 'YM') {
+            return endDate.getMonth() - startDate.getMonth();
+        } else if (unit === 'YD') {
+            const setIgnoreYearUseDay = function (time) {
+                time.setFullYear(1970);
+                setDayIgnoreHour(time);
+            };
+            setIgnoreYearUseDay(startDate);
+            setIgnoreYearUseDay(endDate);
+            return (endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000);
         } else {
-            return Math.floor(result);
+            return 0;
         }
-    } else if (unit === 'MD') {
-        return endDate.getDate() - startDate.getDate();
-    } else if (unit === 'YM') {
-        return endDate.getMonth() - startDate.getMonth();
-    } else if (unit === 'YD') {
-        startDate.setFullYear(1970);
-        endDate.setFullYear(1970);
-        const result = (endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000);
-        if (result < 0) {
-            return -Math.floor(-result);
-        } else {
-            return Math.floor(result);
-        }
-    } else {
-        return 0;
+    } catch (e) {
+        console.warn('DATEDIF error', e.toString());
+        return '';
     }
 }
 
