@@ -195,7 +195,7 @@ const _DefaultExpressionFuncs = {
     // 时间函数
     TIMEDIF, DATEDIF, TODAY, NOW, DATEOFFSET, TIMEOFFSET, DAY, MONTH, YEAR, TODATE, DATEVALUE,
     // 逻辑函数
-    AND, OR, IF, TRUE, FALSE, CASE, NULL, ISNOTNULL, ISNULL,
+    AND, OR, IF, TRUE, FALSE, CASE, NULL, ISNOTNULL, ISNULL, CONTAINS,
     // 文本函数
     LEFT, RIGHT, SEARCH, CONCATENATE, TEXT, TOCAPITAL, TO_CAPITAL_RMB, FIND, SLICE, ID_TO_AGE, TONUMBER,
     CURRENT_USER, CURRENT_ORG, CURRENT_OWNER
@@ -646,6 +646,16 @@ function FIND(targetText: string, text: string, startPoint: number): number {
         return 0;
     }
     return startPoint + subStrtext.indexOf(targetText);
+}
+
+/**
+ * 判断field是否包含在options中，并且支持字符串部分匹配
+ * @param options
+ * @param field
+ * @constructor
+ */
+function CONTAINS(options: string[], field: string): boolean {
+    return options.some((option) => field.includes(option));
 }
 
 /**
