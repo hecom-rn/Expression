@@ -28,6 +28,12 @@ describe('formula', () => {
         currentUser: () => user
     };
     Expression.setConfig(callbackFuncMap);
+    test('CONTAINS',()=>{
+        const options = `['option1', 'option3']`;
+        const field = 'option2/option1'
+        const result = expression(`CONTAINS(${options}, '${field}')`)
+        expect(result).toBeTruthy()
+    });
     test('ABS', () => {
         const f = function (count) {
             const result = expression(`ABS(${count})`);
@@ -153,8 +159,9 @@ describe('formula', () => {
         const dateArr = [
             {key: '"2019-10-10"', value: 10},
             {key: '"2019/12/15"', value: 15},
-            {key: '"异常测试"', value: ''},
-            {key: null, value: ''}
+            {key: '"异常测试"', value: undefined},
+            {key: null, value: undefined},
+            {key: undefined, value: undefined}
         ];
         dateArr.forEach(item => {
             const result = expression(`DAY(${item.key})`);
@@ -166,8 +173,9 @@ describe('formula', () => {
         const dateArr = [
             {key: '"2019-1-10"', value: 1},
             {key: '"2019/12/15"', value: 12},
-            {key: '"异常测试"', value: ''},
-            {key: undefined, value: ''}
+            {key: '"异常测试"', value: undefined},
+            {key: null, value: undefined},
+            {key: undefined, value: undefined}
         ];
         dateArr.forEach(item => {
             const result = expression(`MONTH(${item.key})`);
@@ -179,8 +187,10 @@ describe('formula', () => {
         const dateArr = [
             {key: '"2019-1-10"', value: 2019},
             {key: '"1990/12/15"', value: 1990},
-            {key: '"异常测试"', value: ''},
-            {key: '', value: ''}
+            {key: '"异常测试"', value: undefined},
+            {key: '', value: undefined},
+            {key: null, value: undefined},
+            {key: undefined, value: undefined}
         ];
         dateArr.forEach(item => {
             const result = expression(`YEAR(${item.key})`);
@@ -300,7 +310,7 @@ describe('formula', () => {
         const dateArr = [
             {key: '"209.23"', value: 209.23},
             {key: '"209"', value: 209},
-            {key: '"异常测试"', value: ''},
+            {key: '"异常测试"', value: 0},
         ];
         dateArr.forEach(item => {
             const result = expression(`TONUMBER(${item.key})`);
@@ -365,7 +375,7 @@ describe('formula', () => {
         const dateArr = [
             {key: 422324199610271952, value: 24},
             {key: 110102199209081234, value: 28},
-            {key: 4223241991082719987, value: ''},
+            {key: 4223241991082719987, value: undefined},
         ];
         dateArr.forEach(item => {
             const result = expression(`ID_TO_AGE(${item.key})`);
