@@ -371,13 +371,31 @@ describe('formula', () => {
         });
     });
 
-    test('ID_TO_AGE', () => { //这个期望的值和当前的时间有关系，随着时间的推移，期望的值会越来越大
-        const dateArr = [
-            {key: 422324199610271952, value: 24},
-            {key: 110102199209081234, value: 28},
-            {key: 4223241991082719987, value: undefined},
-        ];
-        dateArr.forEach(item => {
+    test('ID_TO_AGE', () => {
+        const getTestData = function () {//测试数据为动态数据
+            const date = new Date();
+            const currentYear = date.getFullYear();
+            const currentMonth = date.getMonth();
+            const currentDay = date.getDate();
+            const arr = [
+                {key: 422324199610271952, year: 1996, month: 10, day: 27, value: 0},
+                {key: 110102199209081234, year: 1992, month: 9, day: 8, value: 0},
+                {key: 4223241991082719987, year: 1991, month: 9, day: 8, value: undefined},
+            ];
+            arr.forEach(i => {
+                if (i.value == undefined) {
+                    return;
+                }
+                let diffYear = currentYear - i.year;
+                if (currentMonth <= i.month && currentDay <= i.day) {
+                    diffYear = diffYear - 1;
+                }
+                i.value = diffYear;
+            });
+            return arr;
+        };
+
+        getTestData().forEach(item => {
             const result = expression(`ID_TO_AGE(${item.key})`);
             expect(result).toBe(item.value);
         });
