@@ -28,7 +28,7 @@ describe('formula', () => {
         currentUser: () => user
     };
     Expression.setConfig(callbackFuncMap);
-    test('CONTAINS',()=>{
+    test('CONTAINS', () => {
         const options = `['option1', 'option3']`;
         const field = 'option2/option1'
         const result = expression(`CONTAINS(${options}, '${field}')`)
@@ -98,13 +98,20 @@ describe('formula', () => {
         expect(result).toBeFalsy();
     });
     test('ISNULL', () => {
-        const params = [true, '', undefined, 12];
-        params.forEach(item => {
+        const falsy = [true, 12,0,false,{},];
+        // @ts-ignore
+        console.log(false == '')
+        falsy.forEach(item => {
             const result = expression(`ISNULL(${item})`);
+            console.log(item)
             expect(result).toBeFalsy();
         });
-        const result = expression(`ISNULL(null)`);
-        expect(result).toBeTruthy();
+        const truthy = [null, '', undefined,[]]
+        truthy.forEach(item => {
+            const result = expression(`ISNULL(${item})`);
+            expect(result).toBeTruthy();
+        })
+
     });
 
     test('TIMEDIF', () => {

@@ -202,11 +202,11 @@ const _DefaultExpressionFuncs = {
 };
 
 function ISNOTNULL(value) {
-    return !(value === null);
+    return !ISNULL(value);
 }
 
 function ISNULL(value) {
-    return value === null;
+    return value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0);
 }
 
 function ABS(number) {
@@ -480,7 +480,6 @@ function TO_CAPITAL_RMB(money) {
     }
 }
 
-
 function DAY(date) {
     if (date === undefined || date === '' || date === null) {
         return undefined;
@@ -533,7 +532,6 @@ function THOUSANDSEP(number) {
     return defThousandFun(number);
 }
 
-
 function MAX(...args: any[]): number {
     if (Array.isArray(args) && args.length === 0) {
         throw new Error('缺少参数')
@@ -545,7 +543,6 @@ function MAX(...args: any[]): number {
     }
     return Math.max(...numArr);
 }
-
 
 function MIN(...args: any[]): number {
     if (Array.isArray(args) && args.length === 0) {
@@ -670,7 +667,6 @@ function TONUMBER(strNum: string): number {
     const result = Number(strNum);
     return isNaN(result) ? 0 : result;
 }
-
 
 function SLICE(text: string, startPoint: number, length: number): string {
     text = text.toString();
