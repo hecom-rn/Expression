@@ -23,6 +23,7 @@
     "@types/jest": "^24.0.15",
     "eslint-plugin-automatic": "*",
     "jest": "^24.8.0",
+    "jest-date-mock": "^1.0.8",
     "ts-jest": "^24.0.2",
     "tslint": "^5.18.0",
     "typescript": "^3.5.2"
