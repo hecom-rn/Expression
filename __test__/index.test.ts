@@ -1,4 +1,5 @@
 import Expression from '../src/index';
+import {advanceTo, clear} from 'jest-date-mock';
 
 function expression(content: string, data?: any, fieldNames?: any) {
     return Expression.calculate('${' + content + '}', fieldNames, data);
@@ -377,35 +378,19 @@ describe('formula', () => {
         });
     });
 
-    // test('ID_TO_AGE', () => {
-    //     const getTestData = function () {//测试数据为动态数据
-    //         const date = new Date();
-    //         const currentYear = date.getFullYear();
-    //         const currentMonth = date.getMonth();
-    //         const currentDay = date.getDate();
-    //         const arr = [
-    //             {key: 422324199610271952, year: 1996, month: 10, day: 27, value: 0},
-    //             {key: 110102199209081234, year: 1992, month: 9, day: 8, value: 0},
-    //             {key: 4223241991082719987, year: 1991, month: 9, day: 8, value: undefined},
-    //         ];
-    //         arr.forEach(i => {
-    //             if (i.value == undefined) {
-    //                 return;
-    //             }
-    //             let diffYear = currentYear - i.year;
-    //             if (currentMonth <= i.month && currentDay <= i.day) {
-    //                 diffYear = diffYear - 1;
-    //             }
-    //             i.value = diffYear;
-    //         });
-    //         return arr;
-    //     };
-    //
-    //     getTestData().forEach(item => {
-    //         const result = expression(`ID_TO_AGE(${item.key})`);
-    //         expect(result).toBe(item.value);
-    //     });
-    // });
+    test('ID_TO_AGE', () => {
+        advanceTo(new Date('2020-02-20T02:03:30.331Z'));
+        const arr = [
+            {key: 422324199610271952, value: 23},
+            {key: 110102199209081234, value: 27},
+            {key: 4223241991082719987, value: undefined}
+        ];
+        arr.forEach(item => {
+            const result = expression(`ID_TO_AGE(${item.key})`);
+            expect(result).toBe(item.value);
+        });
+        clear();
+    });
 
     test('DATEVALUE', () => {
         const dateArr = [
