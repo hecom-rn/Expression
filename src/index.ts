@@ -3,9 +3,11 @@ export type AnalyzeResult = string[];
 interface User {
     code: string
     name: string
+    metaName: string
     dept?: {
         code: string
         name: string
+        metaName: string
     }
 }
 
@@ -415,6 +417,7 @@ function CURRENT_USER() {
     return {
         code: user.code,
         name: user.name,
+        metaName: user.metaName
     };
 }
 
@@ -424,6 +427,7 @@ function CURRENT_ORG() {
     return {
         code: dept.code,
         name: dept.name,
+        metaName: dept.metaName
     };
 }
 
@@ -745,6 +749,7 @@ function CURRENT_OWNER(): User {
     return {
         code: user.code,
         name: user.name,
+        metaName: user.metaName,
     };
 }
 
