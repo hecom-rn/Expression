@@ -20,13 +20,24 @@ class Proxy {
     }
 }
 
+const MetaName = {
+    User: 'user',
+    Dept: 'dept'
+}
 /**
  * 函数相关的表达式测试用例
  */
 describe('formula', () => {
-    const user = {code: '123', name: 'test', dept: {code: '2', name: 'testDept'}};
+    const user = {
+        code: '123',
+        name: 'test',
+        metaName: MetaName.User,
+        owner: {code:'234', name:'parent', metaName: MetaName.User},
+        dept: {code: '2', name: 'testDept', metaName: MetaName.Dept}
+    };
     const callbackFuncMap = {
-        currentUser: () => user
+        currentUser: () => user,
+        superiors: ()=> user.owner,
     };
     Expression.setConfig(callbackFuncMap);
     test('CONTAINS', () => {
@@ -90,24 +101,24 @@ describe('formula', () => {
     });
 
     test('ISNOTNULL', () => {
-        const truthy = [true, 12,0,false,"{}","'0'"];
+        const truthy = [true, 12, 0, false, "{}", "'0'"];
         truthy.forEach(item => {
             const result = expression(`ISNOTNULL(${item})`);
             expect(result).toBeTruthy();
         });
-        const falsy = [null, '""', undefined,[]]
+        const falsy = [null, '""', undefined, []]
         falsy.forEach(item => {
             const result = expression(`ISNOTNULL(${item})`);
             expect(result).toBeFalsy();
         })
     });
     test('ISNULL', () => {
-        const falsy = [true, 12,0,false,{}];
+        const falsy = ['true', '12', '0', 'false', '{}'];
         falsy.forEach(item => {
             const result = expression(`ISNULL(${item})`);
             expect(result).toBeFalsy();
         });
-        const truthy = [null, '', undefined,[]]
+        const truthy = [null, "''", undefined, '[]']
         truthy.forEach(item => {
             const result = expression(`ISNULL(${item})`);
             expect(result).toBeTruthy();
@@ -136,7 +147,22 @@ describe('formula', () => {
         const result = expression(`CURRENT_USER()`);
         expect(result.code).toBe(user.code);
         expect(result.name).toBe(user.name);
+        expect(result.metaName).toBe(user.metaName);
     });
+
+    test('CURRENT_ORG', () => {
+        const result = expression(`CURRENT_ORG()`);
+        expect(result.code).toBe(user.dept.code);
+        expect(result.name).toBe(user.dept.name);
+        expect(result.metaName).toBe(user.dept.metaName);
+    });
+
+    test('CURRENT_OWNER',()=>{
+        const result = expression(`CURRENT_OWNER()`);
+        expect(result.code).toBe(user.owner.code);
+        expect(result.name).toBe(user.owner.name);
+        expect(result.metaName).toBe(user.owner.metaName);
+    })
 
     test('TO_CAPITAL_RMB', () => {
         const moneyArr = [
