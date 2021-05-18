@@ -373,7 +373,7 @@ function CASE() {
     for (let i = 0; i < (arguments.length - 2) / 2; i++) {
         const value = arguments[i * 2 + 1];
         const result = arguments[i * 2 + 2];
-        if (condition === value || String(condition) === String(value)) {
+        if (condition == value || String(condition) == String(value)) {
             return result;
         }
     }
