@@ -209,7 +209,7 @@ function ISNOTNULL(value) {
 
 function ISNULL(value) {
     return value === null || value === undefined || value === '' ||
-        (value == '' && value != 0) || (Array.isArray(value) && value.length === 0);
+        (value && value.toString() === '') || (Array.isArray(value) && value.length === 0);
 }
 
 function ABS(number) {
