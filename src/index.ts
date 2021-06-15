@@ -197,19 +197,31 @@ const _DefaultExpressionFuncs = {
     // 时间函数
     TIMEDIF, DATEDIF, TODAY, NOW, DATEOFFSET, TIMEOFFSET, DAY, MONTH, YEAR, TODATE, DATEVALUE,
     // 逻辑函数
-    AND, OR, IF, TRUE, FALSE, CASE, NULL, ISNOTNULL, ISNULL, CONTAINS,
+    AND, OR, IF, TRUE, FALSE, CASE, NULL, ISNOTNULL, ISNULL, isNULL, isNotNULL, CONTAINS, INVERT,
     // 文本函数
     LEFT, RIGHT, SEARCH, CONCATENATE, TEXT, TOCAPITAL, TO_CAPITAL_RMB, FIND, SLICE, ID_TO_AGE, TONUMBER,
     CURRENT_USER, CURRENT_ORG, CURRENT_OWNER
 };
 
+function isNotNULL(value) {
+    return ISNOTNULL(value)
+}
+
 function ISNOTNULL(value) {
     return !ISNULL(value);
+}
+
+function isNULL(value) {
+    return ISNULL(value)
 }
 
 function ISNULL(value) {
     return value === null || value === undefined || value === '' ||
         (value && value.toString() === '') || (Array.isArray(value) && value.length === 0);
+}
+
+function INVERT(value) {
+    return Number(!value);
 }
 
 function ABS(number) {
