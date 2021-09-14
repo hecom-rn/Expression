@@ -447,4 +447,45 @@ describe('formula', () => {
             expect(result).toBe(item.result);
         });
     });
+    test('WEEKDAY',()=>{
+        const testData = [
+            {date: 1631462400000, result: 2}, // 2021-9-13
+            {date: 1631462400000, type: 1, result: 2}, // 2021-9-13
+            {date: 1631548800000, type: 1, result: 3}, // 2021-9-14
+            {date: 1631635200000, type: 1, result: 4}, // 2021-9-15
+            {date: 1631721600000, type: 1, result: 5}, // 2021-9-16
+            {date: 1631808000000, type: 1, result: 6}, // 2021-9-17
+            {date: 1631894400000, type: 1, result: 7}, // 2021-9-18
+            {date: 1631980800000, type: 1, result: 1}, // 2021-9-19
+
+            {date: 1631462400000, type: 2, result: 1}, // 2021-9-13
+            {date: 1631548800000, type: 2, result: 2}, // 2021-9-14
+            {date: 1631635200000, type: 2, result: 3}, // 2021-9-15
+            {date: 1631721600000, type: 2, result: 4}, // 2021-9-16
+            {date: 1631808000000, type: 2, result: 5}, // 2021-9-17
+            {date: 1631894400000, type: 2, result: 6}, // 2021-9-18
+            {date: 1631980800000, type: 2, result: 7}, // 2021-9-19
+
+            {date: 1631462400000, type: 3, result: 0}, // 2021-9-13
+            {date: 1631548800000, type: 3, result: 1}, // 2021-9-14
+            {date: 1631635200000, type: 3, result: 2}, // 2021-9-15
+            {date: 1631721600000, type: 3, result: 3}, // 2021-9-16
+            {date: 1631808000000, type: 3, result: 4}, // 2021-9-17
+            {date: 1631894400000, type: 3, result: 5}, // 2021-9-18
+            {date: 1631980800000, type: 3, result: 6}, // 2021-9-19
+            {date: undefined, result: undefined},
+            {date: null,  result: undefined},
+        ];
+
+        testData.forEach(({date, type, result}) => {
+            let expectResult;
+            if (type){
+                expectResult = expect(expression(`WEEKDAY(${date}, ${type})`));
+            } else {
+                expectResult = expect(expression(`WEEKDAY(${date})`))
+            }
+            expectResult.toBe(result)
+        });
+
+    })
 });

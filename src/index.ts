@@ -195,7 +195,7 @@ const _DefaultExpressionFuncs = {
     // 数学函数
     ABS, CEILING, FLOOR, LN, LOG, MOD, ROUND, SQRT, THOUSANDSEP, MAX, MIN,
     // 时间函数
-    TIMEDIF, DATEDIF, TODAY, NOW, DATEOFFSET, TIMEOFFSET, DAY, MONTH, YEAR, TODATE, DATEVALUE,
+    TIMEDIF, DATEDIF, TODAY, NOW, DATEOFFSET, TIMEOFFSET, DAY, MONTH, YEAR, TODATE, DATEVALUE, WEEKDAY,
     // 逻辑函数
     AND, OR, IF, TRUE, FALSE, CASE, NULL, ISNOTNULL, ISNULL, isNULL, isNotNULL, CONTAINS, INVERT,
     // 文本函数
@@ -735,6 +735,28 @@ function ID_TO_AGE(idCard: string): number | undefined {
             (old = currentYear - year - 1)
     }
     return old;
+}
+
+/**
+ * 获取指定时间是星期几
+ * @param date - 时间戳
+ * @param return_type - 1：从星期日开始1-7；2：从星期一开始1-7；3：从星期一开始0-6。默认：1
+ * @constructor
+ */
+function WEEKDAY(date: number, return_type: 1 | 2 | 3 = 1): number {
+    if (typeof date !== 'number') {
+        throw new Error('非法的参数类型：' + typeof date)
+    }
+    const result = _dateFromAny(date);
+    const weekDay = result.getDay();
+    if (return_type === 1) {
+        return weekDay + 1
+    } else if (return_type === 2) {
+        return weekDay === 0 ? 7 : weekDay;
+    } else if (return_type === 3) {
+        return (weekDay + 6) % 7
+    }
+    return weekDay;// 0-6 从星期日开始
 }
 
 function DATEVALUE(text: string | number | Date): string {
