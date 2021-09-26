@@ -38,6 +38,10 @@ describe('formula', () => {
     const callbackFuncMap = {
         currentUser: () => user,
         superiors: ()=> user.owner,
+        thousandFun: (num) => {
+            num = Math.round(num);
+            return (num + '').replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g, '$1,');
+        }
     };
     Expression.setConfig(callbackFuncMap);
     test('CONTAINS', () => {
@@ -247,11 +251,6 @@ describe('formula', () => {
     });
 
     test('THOUSANDSEP', () => {
-        Expression.setThousandFun((num) => {
-            num = Math.round(num);
-            return (num + '').replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g, '$1,');
-        });
-
         const dateArr = [
             {key: 12340.789, value: '12,341'},
             {key: 123456, value: '123,456'},

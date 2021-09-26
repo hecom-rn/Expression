@@ -12,20 +12,26 @@ interface User {
 }
 
 interface Config {
-    currentUser?: () => User
-    eval?: (expr: string, bizData: object) => any
-    superiors?: () => User
+    currentUser?: () => User;
+    eval?: (expr: string, bizData: object) => any;
+    superiors?: () => User;
+    thousandFun?: (num: number) => string;
 }
 
 let defConfig: Config = {};
-let defThousandFun = null;
 
 function setConfig(config: Config) {
     Object.assign(defConfig, config);
 }
 
+/**
+ * @deprecated
+ * 请直接使用 {@link setConfig}
+ * @param thousandFun
+ */
 function setThousandFun(thousandFun: Function) {
-    defThousandFun = thousandFun;
+    console.warn('setThousandFun已废弃，请直接使用setConfig函数进行统一初始化');
+    Object.assign(defConfig, {thousandFun})
 }
 
 /**
@@ -545,8 +551,8 @@ function THOUSANDSEP(number) {
     if (number === undefined || number === '' || number === null || isNaN(number)) {
         return '';
     }
-    if (!defThousandFun) return '';
-    return defThousandFun(number);
+    if (!defConfig.thousandFun) return '';
+    return defConfig.thousandFun(number);
 }
 
 function MAX(...args: any[]): number {
