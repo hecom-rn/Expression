@@ -32,12 +32,12 @@ describe('formula', () => {
         code: '123',
         name: 'test',
         metaName: MetaName.User,
-        owner: {code:'234', name:'parent', metaName: MetaName.User},
+        owner: {code: '234', name: 'parent', metaName: MetaName.User},
         dept: {code: '2', name: 'testDept', metaName: MetaName.Dept}
     };
     const callbackFuncMap = {
         currentUser: () => user,
-        superiors: ()=> user.owner,
+        superiors: () => user.owner,
         thousandFun: (num) => {
             num = Math.round(num);
             return (num + '').replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g, '$1,');
@@ -161,7 +161,7 @@ describe('formula', () => {
         expect(result.metaName).toBe(user.dept.metaName);
     });
 
-    test('CURRENT_OWNER',()=>{
+    test('CURRENT_OWNER', () => {
         const result = expression(`CURRENT_OWNER()`);
         expect(result.code).toBe(user.owner.code);
         expect(result.name).toBe(user.owner.name);
@@ -446,7 +446,7 @@ describe('formula', () => {
             expect(result).toBe(item.result);
         });
     });
-    test('WEEKDAY',()=>{
+    test('WEEKDAY', () => {
         const testData = [
             {date: 1631462400000, result: 2}, // 2021-9-13
             {date: 1631462400000, type: 1, result: 2}, // 2021-9-13
@@ -473,15 +473,21 @@ describe('formula', () => {
             {date: 1631894400000, type: 3, result: 5}, // 2021-9-18
             {date: 1631980800000, type: 3, result: 6}, // 2021-9-19
             {date: undefined, result: undefined},
-            {date: null,  result: undefined},
+            {date: null, result: undefined},
         ];
 
         testData.forEach(({date, type, result}) => {
             let expectResult;
-            if (type){
+            let a
+            if (type) {
+                a = expression(`WEEKDAY(${date + 8 * 60 * 60 * 1000 + 1000}, ${type})`)
                 expectResult = expect(expression(`WEEKDAY(${date}, ${type})`));
             } else {
+                a = expression(`WEEKDAY(${date + 8 * 60 * 60 * 1000 + 1000}, ${type})`)
                 expectResult = expect(expression(`WEEKDAY(${date})`))
+            }
+            if (a == 1 && result == 2) {
+                console.log(date, type);
             }
             expectResult.toBe(result)
         });
