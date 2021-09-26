@@ -478,16 +478,10 @@ describe('formula', () => {
 
         testData.forEach(({date, type, result}) => {
             let expectResult;
-            let a
             if (type) {
-                a = expression(`WEEKDAY(${date + 8 * 60 * 60 * 1000 + 1000}, ${type})`)
                 expectResult = expect(expression(`WEEKDAY(${date}, ${type})`));
             } else {
-                a = expression(`WEEKDAY(${date + 8 * 60 * 60 * 1000 + 1000}, ${type})`)
                 expectResult = expect(expression(`WEEKDAY(${date})`))
-            }
-            if (a == 1 && result == 2) {
-                console.log(date, type);
             }
             expectResult.toBe(result)
         });

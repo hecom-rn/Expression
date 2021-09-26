@@ -9,7 +9,8 @@ stages:
  - test
  - name: deploy
    if: tag =~ ^v
-
+before_install:
+  - export TZ=Asia/Shanghai
 jobs:
   include:
     - stage: test
