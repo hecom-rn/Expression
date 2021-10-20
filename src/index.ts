@@ -343,9 +343,7 @@ function DATEOFFSET(startDateTimestamp, unit, value) {
         date.setFullYear(date.getFullYear() + value);
         return date.getTime();
     } else if (unit === 'M') {
-        const month = date.getMonth() + value;
-        date.setMonth(month % 12);
-        date.setFullYear(date.getFullYear() + month / 12);
+        date.setMonth(date.getMonth() + value );
         return date.getTime();
     } else if (unit === 'D' || unit === 'd') {
         return date.getTime() + value * 24 * 60 * 60 * 1000;

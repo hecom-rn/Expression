@@ -250,6 +250,24 @@ describe('formula', () => {
         });
     });
 
+    it('DATEOFFSET', () => {
+        const date = new Date('2022-01-06').getTime();
+        const testData = [
+            {date, unit: 'Y', value: -3, result: '2019-01-06'},
+            {date, unit: 'y', value: 3, result: '2025-01-06'},
+            {date, unit: 'M', value: -3, result: '2021-10-06'},
+            {date, unit: 'M', value: 3, result: '2022-04-06'},
+            {date, unit: 'D', value: -13, result: '2021-12-24'},
+            {date, unit: 'd', value: 13, result: '2022-01-19'},
+            {date, unit: 'H', value: -11, result: '2022-01-05 21:00:00'},
+            {date, unit: 'h', value: 3, result: '2022-01-06 11:00:00'},
+        ]
+        testData.forEach(item => {
+            const result = expression(`DATEOFFSET(${item.date},'${item.unit}',${item.value})`);
+            expect(new Date(result).toString()).toBe(new Date(item.result).toString());
+        });
+    })
+
     test('THOUSANDSEP', () => {
         const dateArr = [
             {key: 12340.789, value: '12,341'},
