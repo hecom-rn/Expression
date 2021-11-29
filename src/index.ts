@@ -9,6 +9,7 @@ interface User {
         name: string
         metaName: string
     }
+    toString?(): string
 }
 
 interface Config {
@@ -343,7 +344,7 @@ function DATEOFFSET(startDateTimestamp, unit, value) {
         date.setFullYear(date.getFullYear() + value);
         return date.getTime();
     } else if (unit === 'M') {
-        date.setMonth(date.getMonth() + value );
+        date.setMonth(date.getMonth() + value);
         return date.getTime();
     } else if (unit === 'D' || unit === 'd') {
         return date.getTime() + value * 24 * 60 * 60 * 1000;
@@ -434,7 +435,10 @@ function CURRENT_USER() {
     return {
         code: user.code,
         name: user.name,
-        metaName: user.metaName
+        metaName: user.metaName,
+        toString() {
+            return this.name;
+        }
     };
 }
 
@@ -444,7 +448,10 @@ function CURRENT_ORG() {
     return {
         code: dept.code,
         name: dept.name,
-        metaName: dept.metaName
+        metaName: dept.metaName,
+        toString() {
+            return this.name;
+        }
     };
 }
 
@@ -789,6 +796,9 @@ function CURRENT_OWNER(): User {
         code: user.code,
         name: user.name,
         metaName: user.metaName,
+        toString() {
+            return this.name;
+        }
     };
 }
 
