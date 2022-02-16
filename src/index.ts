@@ -335,7 +335,16 @@ function NOW() {
 }
 
 function TIMEOFFSET(startTimestamp, unit, value) {
-    return DATEOFFSET(startTimestamp, unit, value)
+    const date = _dateFromAny(startTimestamp);
+    if (unit === 'H' || unit === 'h') {
+        return date.getTime() + value * 60 * 60 * 1000;
+    } else if (unit === 'M'|| unit === 'm') {
+        return date.getTime() + value* 60 * 1000;
+    } else if (unit === 'S' || unit === 's') {
+        return date.getTime() + value *  1000;
+    } else {
+        return date.getTime();
+    }
 }
 
 function DATEOFFSET(startDateTimestamp, unit, value) {
@@ -343,7 +352,7 @@ function DATEOFFSET(startDateTimestamp, unit, value) {
     if (unit === 'Y' || unit === 'y') {
         date.setFullYear(date.getFullYear() + value);
         return date.getTime();
-    } else if (unit === 'M') {
+    } else if (unit === 'M'|| unit === 'm') {
         date.setMonth(date.getMonth() + value);
         return date.getTime();
     } else if (unit === 'D' || unit === 'd') {

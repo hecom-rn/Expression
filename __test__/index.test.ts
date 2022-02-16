@@ -256,7 +256,7 @@ describe('formula', () => {
             {date, unit: 'Y', value: -3, result: '2019-01-06'},
             {date, unit: 'y', value: 3, result: '2025-01-06'},
             {date, unit: 'M', value: -3, result: '2021-10-06'},
-            {date, unit: 'M', value: 3, result: '2022-04-06'},
+            {date, unit: 'm', value: 3, result: '2022-04-06'},
             {date, unit: 'D', value: -13, result: '2021-12-24'},
             {date, unit: 'd', value: 13, result: '2022-01-19'},
             {date, unit: 'H', value: -11, result: '2022-01-05 21:00:00'},
@@ -264,6 +264,22 @@ describe('formula', () => {
         ]
         testData.forEach(item => {
             const result = expression(`DATEOFFSET(${item.date},'${item.unit}',${item.value})`);
+            expect(new Date(result).toString()).toBe(new Date(item.result).toString());
+        });
+    })
+
+    it('TIMEOFFSET', () => {
+        const date = new Date('2022-01-06 08:00:00').getTime();
+        const testData = [
+            {date, unit: 'H', value: -11, result: '2022-01-05 21:00:00'},
+            {date, unit: 'h', value: 3, result: '2022-01-06 11:00:00'},
+            {date, unit: 'M', value: -3, result: '2022-01-06 07:57:00'},
+            {date, unit: 'm', value: 3, result: '2022-01-06 08:03:00'},
+            {date, unit: 'S', value: -34, result: '2022-01-06 07:59:26'},
+            {date, unit: 's', value: 34, result: '2022-01-06 08:00:34'},
+        ]
+        testData.forEach(item => {
+            const result = expression(`TIMEOFFSET(${item.date},'${item.unit}',${item.value})`);
             expect(new Date(result).toString()).toBe(new Date(item.result).toString());
         });
     })
