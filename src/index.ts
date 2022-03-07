@@ -545,13 +545,15 @@ function YEAR(date: string | number | Date): number | undefined {
 }
 
 function TODATE(year, month, day) {
-    const item = [{'key': year}, {'key': month}, {'key': day}];
+  
+    const item = [{ 'key': year }, { 'key': month }, { 'key': day }];
+       
     const result = item.filter(i => (i.key === undefined || i.key === '' || i.key === null || isNaN(i.key)));
     if (result.length > 0) {
-        return 0;
+        return;
     }
     try {
-        const date = new Date(Date.parse(year + '-' + month + '-' + day));
+        const date = new Date(Number(year), Number(month) - 1, Number(day));
         const result = date.getTime();
         if (result > 0) {
             return result;
