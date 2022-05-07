@@ -215,7 +215,7 @@ function FirstNotNull(...args: any[]) {
         throw new Error('缺少参数')
     }
     for (let i = 0; i < args.length; i++) {
-        if (isNotNULL(args[i])) {
+        if (ISNOTNULL(args[i])) {
             return args[i];
         }
     }
