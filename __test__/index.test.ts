@@ -323,6 +323,24 @@ describe('formula', () => {
         }
     });
 
+    test('FirstNotNull', () => {
+        const dateArr = [
+            {key: [-23, 0, {}, [], undefined], value: -23},
+            {key: [null, '', [], undefined, 0, 3214, -6123599], value: 0},
+            {key: [[], '', 90, undefined, 0, 'undefined', 61235], value: 90},
+            {key: [[], '', undefined, null], value: null},
+        ];
+        dateArr.forEach(item => {
+            const result = expression(`FirstNotNull(${item.key})`);
+            expect(result).toBe(item.value);
+        });
+        try {
+            expression(`FirstNotNull()`);
+        } catch (e) {
+            expect(e.message).toBe('缺少参数');
+        }
+    });
+
     test('MIN', () => {
         const dateArr = [
             {key: [23, 45, 90, 61235, 0, 3214], value: 0},
