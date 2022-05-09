@@ -204,11 +204,23 @@ const _DefaultExpressionFuncs = {
     // 时间函数
     TIMEDIF, DATEDIF, TODAY, NOW, DATEOFFSET, TIMEOFFSET, DAY, MONTH, YEAR, TODATE, DATEVALUE, WEEKDAY,
     // 逻辑函数
-    AND, OR, IF, TRUE, FALSE, CASE, NULL, ISNOTNULL, ISNULL, isNULL, isNotNULL, CONTAINS, INVERT,
+    AND, OR, IF, FirstNotNull, TRUE, FALSE, CASE, NULL, ISNOTNULL, ISNULL, isNULL, isNotNULL, CONTAINS, INVERT,
     // 文本函数
     LEFT, RIGHT, SEARCH, CONCATENATE, TEXT, TOCAPITAL, TO_CAPITAL_RMB, FIND, SLICE, ID_TO_AGE, TONUMBER,
     CURRENT_USER, CURRENT_ORG, CURRENT_OWNER
 };
+
+function FirstNotNull(...args: any[]) {
+    if (Array.isArray(args) && args.length === 0) {
+        throw new Error('缺少参数')
+    }
+    for (let i = 0; i < args.length; i++) {
+        if (ISNOTNULL(args[i])) {
+            return args[i];
+        }
+    }
+    return null;
+}
 
 function isNotNULL(value) {
     return ISNOTNULL(value)
