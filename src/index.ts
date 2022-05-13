@@ -557,12 +557,12 @@ function YEAR(date: string | number | Date): number | undefined {
 }
 
 function TODATE(year, month, day) {
-  
+
     const item = [{ 'key': year }, { 'key': month }, { 'key': day }];
-       
+
     const result = item.filter(i => (i.key === undefined || i.key === '' || i.key === null || isNaN(i.key)));
     if (result.length > 0) {
-        return;
+        return 0;
     }
     try {
         const date = new Date(Number(year), Number(month) - 1, Number(day));
@@ -573,6 +573,7 @@ function TODATE(year, month, day) {
     } catch (e) {
         throw 'error';
     }
+    return 0;
 }
 
 function THOUSANDSEP(number) {
