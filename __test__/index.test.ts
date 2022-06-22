@@ -371,6 +371,10 @@ describe('formula', () => {
             {key: 0.9, value: '零点玖'},
             {key: 12345, value: '壹万贰仟叁佰肆拾伍'},
             {key: 67897.87, value: '陆万柒仟捌佰玖拾柒点捌柒'},
+            {key: 1908, value:'壹仟玖佰零捌'},
+            {key: 190800, value:'壹拾玖万零捌佰'},
+            {key: 190809, value:'壹拾玖万零捌佰零玖'},
+            {key: 1090809, value:'壹佰零玖万零捌佰零玖'},
             {key: '"异常测试"', value: ''},
         ];
         dateArr.forEach(item => {
