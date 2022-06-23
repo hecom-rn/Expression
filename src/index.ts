@@ -646,10 +646,10 @@ function TOCAPITAL(number): string {
             for (let i = 0; i < unit[0].length && integerNum > 0; i++) {
                 let cycle = '';
                 for (let j = 0; j < unit[1].length && integerNum > 0; j++) {
-                    cycle = digit[integerNum % 10] + unit[1][j] + cycle;
+                    cycle = digit[integerNum % 10] + (digit[integerNum % 10] !== '零' ? unit[1][j] : '') + cycle;
                     integerNum = Math.floor(integerNum / 10);
                 }
-                integerChinese = cycle.replace(/(零.)*零$/, '').replace(/^$/, '零') + unit[0][i] + integerChinese;
+                integerChinese = cycle.replace(/零{2,}/, '零').replace(/零$/,'') + unit[0][i] + integerChinese;
             }
         } else {
             integerChinese = '零';
