@@ -2,7 +2,8 @@ import Expression from '../src/index';
 import {advanceTo, clear} from 'jest-date-mock';
 
 function expression(content: string, data?: any, fieldNames?: any) {
-    return Expression.calculate('${' + content + '}', fieldNames, data);
+    // return Expression.calculate('${' + content + '}', fieldNames, data);
+    return Expression.calculateFast(content, data);
 }
 
 class Proxy {
@@ -377,10 +378,10 @@ describe('formula', () => {
             {key: 1023, value: '壹仟零贰拾叁'},
             {key: 10000023, value: '壹仟万零贰拾叁'},
             {key: 1000023, value: '壹佰万零贰拾叁'},
-            {key: 1908, value:'壹仟玖佰零捌'},
-            {key: 190800, value:'壹拾玖万零捌佰'},
-            {key: 190809, value:'壹拾玖万零捌佰零玖'},
-            {key: 1090809, value:'壹佰零玖万零捌佰零玖'},
+            {key: 1908, value: '壹仟玖佰零捌'},
+            {key: 190800, value: '壹拾玖万零捌佰'},
+            {key: 190809, value: '壹拾玖万零捌佰零玖'},
+            {key: 1090809, value: '壹佰零玖万零捌佰零玖'},
             {key: '"异常测试"', value: ''},
         ];
         dateArr.forEach(item => {

@@ -34,7 +34,34 @@ function setThousandFun(thousandFun: Function) {
     console.warn('setThousandFun已废弃，请直接使用setConfig函数进行统一初始化');
     Object.assign(defConfig, {thousandFun})
 }
-
+/**
+ * 计算表达式的值，返回计算结果。
+ * 移除可能的内存分配，尽可能优化执行效率
+ * @param exprStr 表达式
+ * @param data 业务对象的数据
+ * @param useNull 使用null代替undefined的计算结果
+ * @param throwException 计算失败时是否抛出异常
+ */
+function _calculateFast(exprStr: string, data?, {useNull = false, throwException = false} = {}): any {
+    let result;
+    try {
+        const bizData = data;
+        if (defConfig.eval) {
+            result = defConfig.eval(exprStr, bizData)
+        } else {
+            eval('result = ' + exprStr);
+        }
+        if (useNull && result === undefined) {
+            result = null;
+        }
+    } catch (error) {
+        console.warn(`表达式：${exprStr} 计算失败`, error);
+        if (throwException) {
+            throw error
+        }
+    }
+    return result;
+}
 /**
  * 计算表达式的值，返回计算结果。
  * @param exprStr 表达式，必须是"${...}"格式
@@ -828,6 +855,7 @@ function CURRENT_OWNER(): User {
 
 export default {
     calculate: _calculate,
+    calculateFast: _calculateFast,
     analyze: _analyze,
     setConfig,
     setThousandFun,
