@@ -123,7 +123,7 @@ describe('formula', () => {
             const result = expression(`ISNULL(${item})`);
             expect(result).toBeFalsy();
         });
-        const truthy = [null, "''", undefined, '[]']
+        const truthy = [null, "''", undefined, '[]', 'NaN']
         truthy.forEach(item => {
             const result = expression(`ISNULL(${item})`);
             expect(result).toBeTruthy();
@@ -336,6 +336,7 @@ describe('formula', () => {
             {key: ['""', '1', 'undefined', 0, 3214, -6123599], value: 1},
             {key: ['[]', 90, 'undefined', 0, 'undefined', 61235], value: 90},
             {key: ['""', '[]', 'undefined', 'null'], value: null},
+            {key: ['NaN', '120'], value: 120},
         ];
         dateArr.forEach(item => {
             const result = expression(`FirstNotNull(${item.key})`);

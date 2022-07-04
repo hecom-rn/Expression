@@ -263,6 +263,7 @@ function isNULL(value) {
 
 function ISNULL(value) {
     return value === null || value === undefined || value === '' ||
+        (typeof value === 'number' && isNaN(value)) ||
         (value && value.toString() === '') || (Array.isArray(value) && value.length === 0);
 }
 
