@@ -9,12 +9,13 @@ interface User {
         name: string
         metaName: string
     }
+
     toString?(): string
 }
 
 interface Config {
     currentUser?: () => User;
-    eval?: (expr: string, bizData: object) => any;
+    eval?: (expr: string, bizData: object, null2Zero?: boolean) => any;
     superiors?: () => User;
     thousandFun?: (num: number) => string;
 }
@@ -34,6 +35,7 @@ function setThousandFun(thousandFun: Function) {
     console.warn('setThousandFun已废弃，请直接使用setConfig函数进行统一初始化');
     Object.assign(defConfig, {thousandFun})
 }
+
 /**
  * 计算表达式的值，返回计算结果。
  * 移除可能的内存分配，尽可能优化执行效率
@@ -42,12 +44,16 @@ function setThousandFun(thousandFun: Function) {
  * @param useNull 使用null代替undefined的计算结果
  * @param throwException 计算失败时是否抛出异常
  */
-function _calculateFast(exprStr: string, data?, {useNull = false, throwException = false} = {}): any {
+function _calculateFast(exprStr: string, data?, {
+    useNull = false,
+    throwException = false,
+    null2Zero = false
+} = {}): any {
     let result;
     try {
         const bizData = data;
         if (defConfig.eval) {
-            result = defConfig.eval(exprStr, bizData)
+            result = defConfig.eval(exprStr, bizData, null2Zero)
         } else {
             eval('result = ' + exprStr);
         }
@@ -62,6 +68,7 @@ function _calculateFast(exprStr: string, data?, {useNull = false, throwException
     }
     return result;
 }
+
 /**
  * 计算表达式的值，返回计算结果。
  * @param exprStr 表达式，必须是"${...}"格式
@@ -70,7 +77,10 @@ function _calculateFast(exprStr: string, data?, {useNull = false, throwException
  * @param useNull 使用null代替undefined的计算结果
  * @param throwException 计算失败时是否抛出异常
  */
-function _calculate(exprStr: string, fieldnames?: string[], data?, {useNull = false, throwException = false} = {}): any {
+function _calculate(exprStr: string, fieldnames?: string[], data?, {
+    useNull = false,
+    throwException = false
+} = {}): any {
     const expr = exprStr.slice(2, exprStr.length - 1);
     let result;
     try {
@@ -378,10 +388,10 @@ function TIMEOFFSET(startTimestamp, unit, value) {
     const date = _dateFromAny(startTimestamp);
     if (unit === 'H' || unit === 'h') {
         return date.getTime() + value * 60 * 60 * 1000;
-    } else if (unit === 'M'|| unit === 'm') {
-        return date.getTime() + value* 60 * 1000;
+    } else if (unit === 'M' || unit === 'm') {
+        return date.getTime() + value * 60 * 1000;
     } else if (unit === 'S' || unit === 's') {
-        return date.getTime() + value *  1000;
+        return date.getTime() + value * 1000;
     } else {
         return date.getTime();
     }
@@ -392,7 +402,7 @@ function DATEOFFSET(startDateTimestamp, unit, value) {
     if (unit === 'Y' || unit === 'y') {
         date.setFullYear(date.getFullYear() + value);
         return date.getTime();
-    } else if (unit === 'M'|| unit === 'm') {
+    } else if (unit === 'M' || unit === 'm') {
         date.setMonth(date.getMonth() + value);
         return date.getTime();
     } else if (unit === 'D' || unit === 'd') {
@@ -586,7 +596,7 @@ function YEAR(date: string | number | Date): number | undefined {
 
 function TODATE(year, month, day) {
 
-    const item = [{ 'key': year }, { 'key': month }, { 'key': day }];
+    const item = [{'key': year}, {'key': month}, {'key': day}];
 
     const result = item.filter(i => (i.key === undefined || i.key === '' || i.key === null || isNaN(i.key)));
     if (result.length > 0) {
@@ -677,7 +687,7 @@ function TOCAPITAL(number): string {
                     cycle = digit[integerNum % 10] + (digit[integerNum % 10] !== '零' ? unit[1][j] : '') + cycle;
                     integerNum = Math.floor(integerNum / 10);
                 }
-                integerChinese = cycle.replace(/零{2,}/, '零').replace(/零$/,'') + unit[0][i] + integerChinese;
+                integerChinese = cycle.replace(/零{2,}/, '零').replace(/零$/, '') + unit[0][i] + integerChinese;
             }
         } else {
             integerChinese = '零';
