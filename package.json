@@ -20,6 +20,7 @@
     "access": "public"
   },
   "devDependencies": {
+    "sval": "https://github.com/hecom-rn/sval.git#e10619dd390937662a57a6476933d1dd8316c77b",
     "@types/jest": "^24.0.15",
     "eslint-plugin-automatic": "*",
     "jest": "^24.8.0",

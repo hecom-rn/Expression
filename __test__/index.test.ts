@@ -1,5 +1,6 @@
 import Expression from '../src/index';
 import {advanceTo, clear} from 'jest-date-mock';
+import Sval, {SvalOptions} from "sval";
 
 function expression(content: string, data?: any, fieldNames?: any) {
     // return Expression.calculate('${' + content + '}', fieldNames, data);
@@ -25,26 +26,79 @@ const MetaName = {
     User: 'user',
     Dept: 'dept'
 }
-/**
- * 函数相关的表达式测试用例
- */
-describe('formula', () => {
-    const user = {
-        code: '123',
-        name: 'test',
-        metaName: MetaName.User,
-        owner: {code: '234', name: 'parent', metaName: MetaName.User},
-        dept: {code: '2', name: 'testDept', metaName: MetaName.Dept}
-    };
+const user = {
+    code: '123',
+    name: 'test',
+    metaName: MetaName.User,
+    owner: {code: '234', name: 'parent', metaName: MetaName.User},
+    dept: {code: '2', name: 'testDept', metaName: MetaName.Dept}
+};
+function initExpression() {
+    const options = {
+        ecmaVer: 6,
+        sandBox: true,
+        nullSafe: true,
+        operatorHandle: [
+            {
+                name: '+',
+                handle(left, right) {
+                    const typeL = typeof left;
+                    const typeR = typeof right;
+                    if (typeL !== 'number' && typeR !== 'number') {
+                        if (left === null || left === undefined) {
+                            left = '';
+                        }
+                        if (right === null || right === undefined) {
+                            right = '';
+                        }
+                    }
+                    if (typeL === 'object' && left.valueOf) {
+                        left = left.toString();
+                    }
+                    if (typeR === 'object' && right.valueOf) {
+                        right = right.toString();
+                    }
+                    return left + right;
+                },
+            },
+        ],
+    } as SvalOptions;
+    const interpreter = new Sval(options);
+    interpreter.import(Expression.funcMap);
     const callbackFuncMap = {
         currentUser: () => user,
         superiors: () => user.owner,
         thousandFun: (num) => {
             num = Math.round(num);
             return (num + '').replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g, '$1,');
-        }
+        },
+        eval: (expr, bizData, {null2Zero, otherVars}) => {
+            interpreter.import({ bizData, ...otherVars });
+            interpreter.run(`exports.result=${expr}`, { null2Zero });
+            return interpreter.exports.result;
+        },
     };
     Expression.setConfig(callbackFuncMap);
+}
+
+describe('多变量测试',()=>{
+    beforeAll(initExpression);
+    it('多变量测试',()=>{
+        const result = Expression.calculate('${bizData.a + other.b + c.d}',[],{a: 1},
+            {otherVars:{other:{b:1}, c:{d:1}}})
+        expect(result).toEqual(3)
+    })
+    it('未传多变量参数',()=>{
+        const result = Expression.calculate('${bizData.a + bizData.b + bizData.d}',[],{a: 1, b:1,d:1})
+        expect(result).toEqual(3)
+    })
+})
+
+/**
+ * 函数相关的表达式测试用例
+ */
+describe('formula', () => {
+    beforeAll(initExpression);
     test('CONTAINS', () => {
         const options = `['option1', 'option3']`;
         const field = 'option2/option1'
