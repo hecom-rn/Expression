@@ -15,7 +15,9 @@ interface User {
 
 interface Config {
     currentUser?: () => User;
-    eval?: (expr: string, bizData: object, null2Zero?: boolean) => any;
+    eval?: (expr: string, bizData: object, config?: {
+        null2Zero?: boolean, otherVars?: object
+    }) => any;
     superiors?: () => User;
     thousandFun?: (num: number) => string;
 }
@@ -53,7 +55,7 @@ function _calculateFast(exprStr: string, data?, {
     try {
         const bizData = data;
         if (defConfig.eval) {
-            result = defConfig.eval(exprStr, bizData, null2Zero)
+            result = defConfig.eval(exprStr, bizData, {null2Zero})
         } else {
             eval('result = ' + exprStr);
         }
@@ -76,17 +78,21 @@ function _calculateFast(exprStr: string, data?, {
  * @param data 业务对象的数据
  * @param useNull 使用null代替undefined的计算结果
  * @param throwException 计算失败时是否抛出异常
+ * @param null2Zero
+ * @param otherVars
  */
 function _calculate(exprStr: string, fieldnames?: string[], data?, {
     useNull = false,
-    throwException = false
+    throwException = false,
+    null2Zero = false,
+    otherVars = null,
 } = {}): any {
     const expr = exprStr.slice(2, exprStr.length - 1);
     let result;
     try {
-        const bizData = Object.assign({}, data);
+        const bizData = Object.assign({}, data );
         if (defConfig.eval) {
-            result = defConfig.eval(expr, bizData)
+            result = defConfig.eval(expr, bizData, {null2Zero, otherVars})
         } else {
             eval('result = ' + expr);
         }
