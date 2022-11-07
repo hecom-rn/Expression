@@ -45,17 +45,20 @@ function setThousandFun(thousandFun: Function) {
  * @param data 业务对象的数据
  * @param useNull 使用null代替undefined的计算结果
  * @param throwException 计算失败时是否抛出异常
+ * @param null2Zero 参与计算的值为空时，是否转0
+ * @param otherVars 多变量
  */
 function _calculateFast(exprStr: string, data?, {
     useNull = false,
     throwException = false,
-    null2Zero = false
+    null2Zero = false,
+    otherVars = null,
 } = {}): any {
     let result;
     try {
         const bizData = data;
         if (defConfig.eval) {
-            result = defConfig.eval(exprStr, bizData, {null2Zero})
+            result = defConfig.eval(exprStr, bizData, {null2Zero, otherVars})
         } else {
             eval('result = ' + exprStr);
         }
@@ -78,8 +81,8 @@ function _calculateFast(exprStr: string, data?, {
  * @param data 业务对象的数据
  * @param useNull 使用null代替undefined的计算结果
  * @param throwException 计算失败时是否抛出异常
- * @param null2Zero
- * @param otherVars
+ * @param null2Zero 参与计算的值为空时，是否转0
+ * @param otherVars 多变量
  */
 function _calculate(exprStr: string, fieldnames?: string[], data?, {
     useNull = false,
