@@ -412,7 +412,14 @@ function DATEOFFSET(startDateTimestamp, unit, value) {
         date.setFullYear(date.getFullYear() + value);
         return date.getTime();
     } else if (unit === 'M' || unit === 'm') {
+        const preDay = date.getDate();
         date.setMonth(date.getMonth() + value);
+        const curDay = date.getDate();
+        let nextDay = date.getDate();
+        while (!(preDay === curDay  || nextDay > curDay)) {
+            date.setTime(date.getTime() - 24 * 60 * 60 * 1000);
+            nextDay = date.getDate();
+        }
         return date.getTime();
     } else if (unit === 'D' || unit === 'd') {
         return date.getTime() + value * 24 * 60 * 60 * 1000;

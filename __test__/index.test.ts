@@ -321,6 +321,20 @@ describe('formula', () => {
             const result = expression(`DATEOFFSET(${item.date},'${item.unit}',${item.value})`);
             expect(new Date(result).toString()).toBe(new Date(item.result).toString());
         });
+
+        // 补充月份边界
+        const date1 = new Date('2022-03-31').getTime();
+        const testData1 = [
+            { date: date1, unit: 'M', value: -2, result: '2022-01-31' },
+            { date: date1, unit: 'M', value: 1, result: '2022-04-30' },
+            { date: date1, unit: 'M', value: 2, result: '2022-05-31' },
+            { date: date1, unit: 'M', value: 6, result: '2022-09-30' },
+            { date: date1, unit: 'M', value: 12, result: '2023-03-31' },
+        ]
+        testData1.forEach(item => {
+            const result = expression(`DATEOFFSET(${item.date},'${item.unit}',${item.value})`);
+            expect(new Date(result).toString()).toBe(new Date(item.result).toString());
+        });
     })
 
     it('TIMEOFFSET', () => {
