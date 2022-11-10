@@ -1,6 +1,6 @@
 {
   "name": "@hecom/expression",
-  "version": "1.7.3",
+  "version": "1.7.4",
   "private": false,
   "description": "Calculate Expression",
   "main": "src/index.ts",
