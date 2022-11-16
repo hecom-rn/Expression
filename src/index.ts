@@ -385,6 +385,15 @@ function NOW() {
 }
 
 function TIMEOFFSET(startTimestamp, unit, value) {
+    if (typeof value !== 'number') {
+        throw new Error('TIMEOFFSET中: value需要是数值类型');
+    }
+    if (!unit) {
+        throw new Error('TIMEOFFSET中: unit为必填');
+    }
+    if (startTimestamp === undefined) {
+        throw new Error('TIMEOFFSET中: 开始时间为必填');
+    }
     const date = _dateFromAny(startTimestamp);
     if (unit === 'H' || unit === 'h') {
         return date.getTime() + value * 60 * 60 * 1000;
@@ -398,6 +407,15 @@ function TIMEOFFSET(startTimestamp, unit, value) {
 }
 
 function DATEOFFSET(startDateTimestamp, unit, value) {
+    if (typeof value !== 'number' ) {
+        throw new Error('DATEOFFSET: value需要是数值类型');
+    }
+    if (!unit) {
+        throw new Error('DATEOFFSET: unit为必填');
+    }
+    if (startDateTimestamp === undefined) {
+        throw new Error('DATEOFFSET: 开始时间为必填');
+    }
     const date = _dateFromAny(startDateTimestamp);
     if (unit === 'Y' || unit === 'y') {
         date.setFullYear(date.getFullYear() + value);
