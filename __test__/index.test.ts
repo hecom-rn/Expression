@@ -315,11 +315,22 @@ describe('formula', () => {
             {date, unit: 'D', value: -13, result: '2021-12-24'},
             {date, unit: 'd', value: 13, result: '2022-01-19'},
             {date, unit: 'H', value: -11, result: '2022-01-05 21:00:00'},
-            {date, unit: 'h', value: 3, result: '2022-01-06 11:00:00'},
+            { date: undefined, unit: 'h', value: 3, result: undefined },
+            { date: undefined, unit: 'h', value: '3', result: undefined },
+            { date, unit: 'y', value: '3', result: '2025-01-06' },
+            { date, value: 3, result: undefined },
         ]
         testData.forEach(item => {
-            const result = expression(`DATEOFFSET(${item.date},'${item.unit}',${item.value})`);
-            expect(new Date(result).toString()).toBe(new Date(item.result).toString());
+            const result = !item.value ? expression(`DATEOFFSET(${item.date},'${item.unit}',)`) :
+                !item.date ? expression(`DATEOFFSET(,'${item.unit}',${item.value})`) :
+                    !item.unit ? expression(`DATEOFFSET(${item.date},,${item.value})`) :
+                        expression(`DATEOFFSET(${item.date},'${item.unit}',${item.value})`);
+            if (result === undefined) {
+                expect(result).toBe(item.result);
+            } else {
+                expect(new Date(result).toString()).toBe(new Date(item.result).toString());
+            }
+        
         });
 
         // 补充月份边界
@@ -345,11 +356,24 @@ describe('formula', () => {
             {date, unit: 'M', value: -3, result: '2022-01-06 07:57:00'},
             {date, unit: 'm', value: 3, result: '2022-01-06 08:03:00'},
             {date, unit: 'S', value: -34, result: '2022-01-06 07:59:26'},
-            {date, unit: 's', value: 34, result: '2022-01-06 08:00:34'},
+            { date, unit: 's', value: 34, result: '2022-01-06 08:00:34' },
+            { date, unit: 'h', value: 3, result: '2022-01-06 11:00:00' },
+            { date, unit: 'h', result: undefined },
+            { date: undefined, unit: 'h', value: 3, result: undefined },
+            { date: undefined, unit: 'h', value: '3', result: undefined },
+            { date, unit: 'h', value: '3', result: '2022-01-06 11:00:00' },
+            { date, value: 3, result: undefined },
         ]
         testData.forEach(item => {
-            const result = expression(`TIMEOFFSET(${item.date},'${item.unit}',${item.value})`);
-            expect(new Date(result).toString()).toBe(new Date(item.result).toString());
+            const result = !item.value ? expression(`TIMEOFFSET(${item.date},'${item.unit}',)`) :
+                !item.date ? expression(`TIMEOFFSET(,'${item.unit}',${item.value})`) :
+                    !item.unit ? expression(`TIMEOFFSET(${item.date},,${item.value})`) :
+                        expression(`TIMEOFFSET(${item.date},'${item.unit}',${item.value})`);
+            if (result === undefined) {
+                expect(result).toBe(item.result);
+            } else {
+                expect(new Date(result).toString()).toBe(new Date(item.result).toString());
+            }
         });
     })
 
