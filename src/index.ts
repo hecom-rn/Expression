@@ -581,7 +581,9 @@ function TO_CAPITAL_RMB(money) {
         money = Math.abs(money);
         let chinese = '';
         for (let i = 0; i < fraction.length; i++) {
-            chinese += (digit[Math.round(money * 10 * Math.pow(10, i)) % 10] + fraction[i]).replace(/零./, '');
+            const decimalArr = (String(money).split('.')[1] || '').split('');
+            const index = decimalArr[i] || 0;
+            chinese += (digit[index] + fraction[i]).replace(/零./, '');
         }
         chinese = chinese || '整';
         money = Math.floor(money);
