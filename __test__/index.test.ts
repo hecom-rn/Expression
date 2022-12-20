@@ -230,6 +230,8 @@ describe('formula', () => {
             {key: 88776699.55, value: '捌仟捌佰柒拾柒万陆仟陆佰玖拾玖元伍角伍分'},
             {key: '"88异常测试99"', value: ''},
             {key: '"987654.12"', value: '玖拾捌万柒仟陆佰伍拾肆元壹角贰分'},
+            {key: 33449.74, value: '叁万叁仟肆佰肆拾玖元柒角肆分' },
+            {key: 33449, value: '叁万叁仟肆佰肆拾玖元整'},
         ];
         moneyArr.forEach(item => {
             const result = expression(`TO_CAPITAL_RMB(${item.key})`);
