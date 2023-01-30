@@ -1,3 +1,7 @@
+import Decimal from "decimal.js";
+import moment from "moment";
+import {FunctionTypeMap, ObjectType, TYPE} from "sval";
+
 export type AnalyzeResult = string[];
 
 interface User {
@@ -16,7 +20,7 @@ interface User {
 interface Config {
     currentUser?: () => User;
     eval?: (expr: string, bizData: object, config?: {
-        null2Zero?: boolean, otherVars?: object
+        null2Zero?: boolean, otherVars?: object, objectType: ObjectType
     }) => any;
     superiors?: () => User;
     thousandFun?: (num: number) => string;
@@ -53,12 +57,12 @@ function _calculateFast(exprStr: string, data?, {
     throwException = false,
     null2Zero = false,
     otherVars = null,
+    objectType = null,
 } = {}): any {
-    let result;
+    let result = null;
     try {
-        const bizData = data;
         if (defConfig.eval) {
-            result = defConfig.eval(exprStr, bizData, {null2Zero, otherVars})
+            result = defConfig.eval(exprStr, data, {null2Zero, otherVars, objectType})
         } else {
             eval('result = ' + exprStr);
         }
@@ -89,13 +93,14 @@ function _calculate(exprStr: string, fieldnames?: string[], data?, {
     throwException = false,
     null2Zero = false,
     otherVars = null,
+    objectType = null,
 } = {}): any {
     const expr = exprStr.slice(2, exprStr.length - 1);
-    let result;
+    let result = null;
     try {
-        const bizData = Object.assign({}, data );
+        const bizData = Object.assign({}, data);
         if (defConfig.eval) {
-            result = defConfig.eval(expr, bizData, {null2Zero, otherVars})
+            result = defConfig.eval(expr, bizData, {null2Zero, otherVars, objectType})
         } else {
             eval('result = ' + expr);
         }
@@ -248,7 +253,7 @@ const _DefaultExpressionFuncs = {
     // 数学函数
     ABS, CEILING, FLOOR, LN, LOG, MOD, ROUND, SQRT, THOUSANDSEP, MAX, MIN,
     // 时间函数
-    TIMEDIF, DATEDIF, TODAY, NOW, DATEOFFSET, TIMEOFFSET, DAY, MONTH, YEAR, TODATE, DATEVALUE, WEEKDAY,
+    TIMEDIF, DATEDIF, TODAY, NOW, DATEOFFSET, TIMEOFFSET, DAY, MONTH, YEAR, TODATE, DATEVALUE, WEEKDAY, TOTIMESTAMP,
     // 逻辑函数
     AND, OR, IF, FirstNotNull, TRUE, FALSE, CASE, NULL, ISNOTNULL, ISNULL, isNULL, isNotNULL, CONTAINS, INVERT,
     // 文本函数
@@ -256,9 +261,77 @@ const _DefaultExpressionFuncs = {
     CURRENT_USER, CURRENT_ORG, CURRENT_OWNER
 };
 
+export const FuncTypeMap: FunctionTypeMap = {
+    // 文本函数
+    LEFT: {name: 'LEFT', returnType: TYPE.STRING, argsType: (i) => i == 0 ? TYPE.STRING : TYPE.NUMBER},
+    RIGHT: {name: 'RIGHT', returnType: TYPE.STRING, argsType: (i) => i == 0 ? TYPE.STRING : TYPE.NUMBER},
+    SEARCH: {name: 'SEARCH', returnType: TYPE.BOOLEAN, argsType: () => TYPE.STRING},
+    CONCATENATE: {name: 'CONCATENATE', returnType: TYPE.STRING, argsType: () => TYPE.ANY},
+    TEXT: {name: 'TEXT', returnType: TYPE.STRING, argsType: () => TYPE.ANY},
+    TOCAPITAL: {name: 'TOCAPITAL', returnType: TYPE.STRING, argsType: () => TYPE.NUMBER},
+    TO_CAPITAL_RMB: {name: 'TO_CAPITAL_RMB', returnType: TYPE.STRING, argsType: () => TYPE.NUMBER},
+    FIND: {name: 'FIND', returnType: TYPE.NUMBER, argsType: (i) => i == 0 || i == 1 ? TYPE.STRING : TYPE.NUMBER},
+    SLICE: {name: 'SLICE', returnType: TYPE.STRING, argsType: (i) => i == 0 ? TYPE.STRING : TYPE.NUMBER},
+    ID_TO_AGE: {name: 'ID_TO_AGE', returnType: TYPE.NUMBER, argsType: () => TYPE.STRING},
+    TONUMBER: {name: 'TONUMBER', returnType: TYPE.NUMBER, argsType: () => TYPE.STRING},
+    // 逻辑函数
+    AND: {name: 'AND', returnType: TYPE.BOOLEAN, argsType: () => TYPE.BOOLEAN},
+    OR: {name: 'OR', returnType: TYPE.BOOLEAN, argsType: () => TYPE.BOOLEAN},
+    IF: {name: 'IF', returnType: TYPE.ANY, argsType: (index) => index == 1 ? TYPE.BOOLEAN : TYPE.ANY},
+    FirstNotNull: {name: 'FirstNotNull', returnType: TYPE.ANY, argsType: () => TYPE.ANY},
+    TRUE: {name: 'TRUE', returnType: TYPE.BOOLEAN, argsType: null},
+    FALSE: {name: 'FALSE', returnType: TYPE.BOOLEAN, argsType: null},
+    isNotNULL: {name: 'isNotNULL', returnType: TYPE.BOOLEAN, argsType: () => TYPE.ANY},
+    ISNOTNULL: {name: 'ISNOTNULL', returnType: TYPE.BOOLEAN, argsType: () => TYPE.ANY},
+    isNULL: {name: 'isNULL', returnType: TYPE.BOOLEAN, argsType: () => TYPE.ANY},
+    ISNULL: {name: 'ISNULL', returnType: TYPE.BOOLEAN, argsType: () => TYPE.ANY},
+    // 时间函数
+    TIMEDIF: {
+        name: 'TIMEDIF',
+        returnType: TYPE.NUMBER,
+        argsType: (i) => i == 0 || i == 1 ? TYPE.DATETIME : TYPE.STRING
+    },
+    DATEDIF: {
+        name: 'DATEDIF',
+        returnType: TYPE.NUMBER,
+        argsType: (i) => i == 0 || i == 1 ? TYPE.DATETIME : TYPE.STRING
+    },
+    TODAY: {name: 'TODAY', returnType: TYPE.DATETIME, argsType: null},
+    NOW: {name: 'NOW', returnType: TYPE.DATETIME, argsType: null},
+    DATEOFFSET: {
+        name: 'DATEOFFSET',
+        returnType: TYPE.DATETIME,
+        argsType: (i) => i == 0 ? TYPE.DATETIME : i == 1 ? TYPE.STRING : TYPE.NUMBER
+    },
+    TIMEOFFSET: {
+        name: 'TIMEOFFSET',
+        returnType: TYPE.DATETIME,
+        argsType: (i) => i == 0 ? TYPE.DATETIME : i == 1 ? TYPE.STRING : TYPE.NUMBER
+    },
+    DAY: {name: 'DAY', returnType: TYPE.NUMBER, argsType: () => TYPE.DATETIME},
+    MONTH: {name: 'MONTH', returnType: TYPE.NUMBER, argsType: () => TYPE.DATETIME},
+    YEAR: {name: 'YEAR', returnType: TYPE.NUMBER, argsType: () => TYPE.DATETIME},
+    TODATE: {name: 'TODATE', returnType: TYPE.DATETIME, argsType: () => TYPE.NUMBER},
+    DATEVALUE: {name: 'DATEVALUE', returnType: TYPE.STRING, argsType: () => TYPE.DATETIME},
+    WEEKDAY: {name: 'WEEKDAY', returnType: TYPE.NUMBER, argsType: (i) => i == 0 ? TYPE.DATETIME : TYPE.NUMBER},
+    // 数学函数
+    ABS: {name: 'ABS', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER},
+    CEILING: {name: 'CEILING', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER},
+    FLOOR: {name: 'FLOOR', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER},
+    LN: {name: 'LN', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER},
+    LOG: {name: 'LOG', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER},
+    MOD: {name: 'MOD', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER},
+    ROUND: {name: 'ROUND', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER},
+    SQRT: {name: 'SQRT', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER},
+    THOUSANDSEP: {name: 'THOUSANDSEP', returnType: TYPE.STRING, argsType: () => TYPE.NUMBER},
+    MAX: {name: 'MAX', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER},
+    MIN: {name: 'MIN', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER},
+
+}
+
 function FirstNotNull(...args: any[]) {
     if (Array.isArray(args) && args.length === 0) {
-        throw new Error('缺少参数')
+        return null
     }
     for (let i = 0; i < args.length; i++) {
         if (ISNOTNULL(args[i])) {
@@ -281,9 +354,7 @@ function isNULL(value) {
 }
 
 function ISNULL(value) {
-    return value === null || value === undefined || value === '' ||
-        (typeof value === 'number' && isNaN(value)) ||
-        (value && value.toString() === '') || (Array.isArray(value) && value.length === 0);
+    return value == null || typeof value === 'number' && isNaN(value) || Array.isArray(value) && value.length === 0;
 }
 
 function INVERT(value) {
@@ -291,67 +362,136 @@ function INVERT(value) {
 }
 
 function ABS(number) {
+    if (number == null || isNaN(number)) {
+        return null;
+    }
     return Math.abs(number);
 }
 
 function CEILING(number) {
-    return Math.ceil(number);
+    if (number == null || isNaN(number)) {
+        return null;
+    }
+    const result = Math.ceil(number);
+    // 排除-0的情况
+    if (result == 0) {
+        return 0;
+    }
+    return result;
 }
 
 function FLOOR(number) {
+    if (number == null || isNaN(number)) {
+        return null;
+    }
     return Math.floor(number);
 }
 
 function LN(number) {
-    return Math.log(number);
+    if (number == null || isNaN(number)) {
+        return null;
+    }
+    const result = Math.log(number);
+    if (result === Infinity || result === -Infinity || isNaN(result)) {
+        return null;
+    }
+    return ROUND(result, 7);
 }
 
 function LOG(number) {
-    return Math.log10(number);
+    if (number == null || isNaN(number)) {
+        return null;
+    }
+    const result = Math.log10(number);
+    if (result === Infinity || result === -Infinity || isNaN(result)) {
+        return null;
+    }
+    return ROUND(result, 7);
 }
 
 function MOD(number, divisor) {
-    return number % divisor;
+    if (number == null || isNaN(number) || divisor == null || isNaN(divisor)) {
+        return null;
+    }
+    const result = number % divisor;
+    if (result === Infinity || result === -Infinity || isNaN(result)) {
+        return null;
+    }
+    return ROUND(result, 7);
 }
 
 function ROUND(number, num_digits) {
-    let x = 1;
-    for (let i = 0; i < num_digits; i++) {
-        x = x * 10;
+    if (number == null || isNaN(number) || num_digits == null || isNaN(num_digits)) {
+        return null;
     }
-    return Math.round(number * x) / x;
+    // eslint-disable-next-line init-declarations
+    let result: number;
+    const decimal = new Decimal(number);
+    if (num_digits < 0) {
+        result = decimal.times(Math.pow(10, num_digits))
+            .toDP(0, Decimal.ROUND_HALF_UP)
+            .div(Math.pow(10, num_digits))
+            .toNumber();
+    } else {
+        result = decimal.toDP(num_digits, Decimal.ROUND_HALF_UP).toNumber();
+    }
+    if (result == 0) return 0;
+    if (result == Infinity || result == -Infinity || isNaN(result)) return null
+    return result;
 }
 
 function SQRT(number) {
-    return Math.sqrt(number);
+    if (number == null || isNaN(number)) {
+        return null;
+    }
+    const result = Math.sqrt(number);
+    if (result == Infinity || result == -Infinity || isNaN(result)) return null
+    return ROUND(result, 7);
 }
 
 function TIMEDIF(startTime, endTime, unit) {
-    const diff = Number(endTime) - Number(startTime);
-    if (!isNaN(diff)) {
-        const func = diff >= 0 ? Math.floor : Math.ceil;
-        if (unit === 'h' || unit === 'H') {
-            return func(diff / 1000 / 3600)
-        } else if (unit === 'm') {
-            return func(diff / 1000 / 60)
-        } else if (unit === 's') {
-            return func(diff / 1000)
+    try {
+        if (startTime == null || endTime == null || unit == null) {
+            return null;
         }
-
+        const start = _dateFromAny(endTime);
+        const end = _dateFromAny(startTime);
+        if (start == null || end == null) {
+            return null;
+        }
+        const diff = Number(start.getTime()) - Number(end.getTime());
+        if (!isNaN(diff)) {
+            const func = diff >= 0 ? Math.floor : Math.ceil;
+            if (unit === 'h' || unit === 'H') {
+                return func(diff / 1000 / 3600)
+            } else if (unit === 'm') {
+                return func(diff / 1000 / 60)
+            } else if (unit === 's') {
+                return func(diff / 1000)
+            }
+        }
+        return null;
+    } catch (e) {
+        return null
     }
-    return 0;
 }
 
 function DATEDIF(startDateTimestamp, endDateTimestamp, unit) {
-    const setDayIgnoreHour = function (time) {
-        time.setHours(0);
-        time.setMinutes(0);
-        time.setSeconds(0);
-        time.setMilliseconds(0);
-    };
     try {
+        if (startDateTimestamp == null || endDateTimestamp == null || unit == null) {
+            return null;
+        }
         const startDate = _dateFromAny(startDateTimestamp);
         const endDate = _dateFromAny(endDateTimestamp);
+        if (startDate == null || endDate == null) {
+            return null;
+        }
+        const setDayIgnoreHour = function (time) {
+            time.setHours(0);
+            time.setMinutes(0);
+            time.setSeconds(0);
+            time.setMilliseconds(0);
+        };
         if (unit === 'Y' || unit === 'y') {
             return endDate.getFullYear() - startDate.getFullYear();
         } else if (unit === 'M') {
@@ -373,11 +513,11 @@ function DATEDIF(startDateTimestamp, endDateTimestamp, unit) {
             setIgnoreYearUseDay(endDate);
             return (endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000);
         } else {
-            return 0;
+            return null;
         }
     } catch (e) {
         console.warn('DATEDIF error', e.toString());
-        return '';
+        return null;
     }
 }
 
@@ -394,77 +534,91 @@ function NOW() {
 }
 
 function TIMEOFFSET(startTimestamp, unit, value) {
-    if (typeof value !== 'number') {
-        throw new Error('TIMEOFFSET中: value需要是数值类型');
-    }
-    if (!unit) {
-        throw new Error('TIMEOFFSET中: unit为必填');
-    }
-    if (startTimestamp === undefined) {
-        throw new Error('TIMEOFFSET中: 开始时间为必填');
-    }
-    const date = _dateFromAny(startTimestamp);
-    if (unit === 'H' || unit === 'h') {
-        return date.getTime() + value * 60 * 60 * 1000;
-    } else if (unit === 'M' || unit === 'm') {
-        return date.getTime() + value * 60 * 1000;
-    } else if (unit === 'S' || unit === 's') {
-        return date.getTime() + value * 1000;
-    } else {
-        return date.getTime();
+    try {
+        if (typeof value !== 'number' || !unit || startTimestamp === undefined || startTimestamp === null) {
+            return null;
+        }
+        const date = _dateFromAny(startTimestamp);
+        if (date == null) {
+            return null
+        }
+        if (unit === 'H' || unit === 'h') {
+            return date.getTime() + value * 60 * 60 * 1000;
+        } else if (unit === 'M' || unit === 'm') {
+            return date.getTime() + value * 60 * 1000;
+        } else if (unit === 'S' || unit === 's') {
+            return date.getTime() + value * 1000;
+        } else {
+            return null;
+        }
+    } catch (e) {
+        return null;
     }
 }
 
 function DATEOFFSET(startDateTimestamp, unit, value) {
-    if (typeof value !== 'number' ) {
-        throw new Error('DATEOFFSET: value需要是数值类型');
-    }
-    if (!unit) {
-        throw new Error('DATEOFFSET: unit为必填');
-    }
-    if (startDateTimestamp === undefined) {
-        throw new Error('DATEOFFSET: 开始时间为必填');
-    }
-    const date = _dateFromAny(startDateTimestamp);
-    if (unit === 'Y' || unit === 'y') {
-        date.setFullYear(date.getFullYear() + value);
-        return date.getTime();
-    } else if (unit === 'M' || unit === 'm') {
-        const preDay = date.getDate();
-        date.setMonth(date.getMonth() + value);
-        const curDay = date.getDate();
-        let nextDay = date.getDate();
-        while (!(preDay === curDay  || nextDay > curDay)) {
-            date.setTime(date.getTime() - 24 * 60 * 60 * 1000);
-            nextDay = date.getDate();
+    try {
+        if (typeof value !== 'number' || !unit || startDateTimestamp === undefined || startDateTimestamp === null) {
+            return null;
         }
-        return date.getTime();
-    } else if (unit === 'D' || unit === 'd') {
-        return date.getTime() + value * 24 * 60 * 60 * 1000;
-    } else if (unit === 'H' || unit === 'h') {
-        return date.getTime() + value * 60 * 60 * 1000;
-    } else {
-        return date.getTime();
+        const date = moment(startDateTimestamp);
+        if (!date.isValid()) {
+            return null
+        }
+        let diffUnit = null;
+        switch (unit) {
+            case 'Y':
+            case 'y':
+                diffUnit = 'y';
+                break;
+            case 'M':
+            case 'm':
+                diffUnit = 'M';
+                break;
+            case 'D':
+            case 'd':
+                diffUnit = 'd';
+                break;
+            case 'H':
+            case 'h':
+                diffUnit = 'h';
+                break;
+        }
+        if (diffUnit == null) {
+            return null;
+        }
+        return date.add(value, diffUnit).valueOf();
+    } catch (e) {
+        return null;
     }
 }
 
 function AND(...args: any[]) {
+    if (args.some(arg => typeof arg != 'boolean')) {
+        return null;
+    }
     let result = true;
     args.forEach(arg => {
-        result = result && arg
+        result = result && !!arg
     });
     return result;
 }
 
 function OR(...args: any[]) {
+    if (args.some(arg => typeof arg != 'boolean')) {
+        return null;
+    }
     let result = false;
     args.forEach(arg => {
-        result = result || arg;
+        result = result || !!arg;
     });
     return result;
 }
 
 function IF(logicalTest, valueIfTrue, valueIfFalse) {
+    if (logicalTest != null && typeof logicalTest != "boolean") {
+        return null;
+    }
     return logicalTest ? valueIfTrue : valueIfFalse;
 }
 
@@ -496,29 +650,35 @@ function NULL() {
 }
 
 function LEFT(str, numberChars) {
-    if (isNaN(numberChars)) {
-        throw new Error('numberChars: ' + numberChars + ' 必须是一个数值')
+    if (str == null || numberChars == null || isNaN(numberChars)) {
+        return null;
     }
     return str.toString().substring(0, numberChars);
 }
 
 function RIGHT(str, numberChars) {
-    if (isNaN(numberChars)) {
-        throw new Error('numberChars: ' + numberChars + ' 必须是一个数值')
+    if (str == null || numberChars == null || isNaN(numberChars)) {
+        return null;
     }
     str = str.toString();
     return str.substring(str.length - numberChars, str.length);
 }
 
 function SEARCH(str, keyword) {
+    if (str == null || keyword == null) {
+        return null;
+    }
     return str.toString().indexOf(keyword.toString()) !== -1;
 }
 
-function CONCATENATE() {
-    return Array.prototype.join.call(arguments, '');
+function CONCATENATE(...args) {
+    return args.join('');
 }
 
 function TEXT(value) {
+    if (value == null || typeof value.toString != 'function') {
+        return null;
+    }
     return value.toString();
 }
 
@@ -548,9 +708,12 @@ function CURRENT_ORG() {
     };
 }
 
-function _dateFromAny(obj: string | number | Date): Date {
+export function _dateFromAny(obj: string | number | Date): Date {
     if (typeof obj === 'string') {
-        const times = obj.split(/[ :/-]/, 6).map(item => Number(item));
+        const times = obj.split(/[ :/-]/, 6).map(item => Number(item)).filter(i => !isNaN(i));
+        if (times.length === 0) {
+            return null;
+        }
         return new Date(times[0], times[1] - 1 || 0, times[2] || 1, times[3] || 0, times[4] || 0, times[5] || 0);
     } else if (typeof obj === 'number') {
         return new Date(obj);
@@ -560,30 +723,30 @@ function _dateFromAny(obj: string | number | Date): Date {
 }
 
 function TO_CAPITAL_RMB(money) {
-    if (money === undefined || money === null || money === '') {
-        return '';
+    if (money == null || money === '' || isNaN(money)) {
+        return null;
     }
 
     try {
-        if (isNaN(money)) {
-            return '';
-        }
         const fraction = ['角', '分'];
         const digit = [
             '零', '壹', '贰', '叁', '肆',
             '伍', '陆', '柒', '捌', '玖'
         ];
         const unit = [
-            ['元', '万', '亿'],
+            ['元', '万', '亿', '万'],
             ['', '拾', '佰', '仟']
         ];
         const head = money < 0 ? '负' : '';
         money = Math.abs(money);
         let chinese = '';
-        for (let i = 0; i < fraction.length; i++) {
-            const decimalArr = (String(money).split('.')[1] || '').split('');
-            const index = decimalArr[i] || 0;
-            chinese += (digit[index] + fraction[i]).replace(/零./, '');
+        if (String(money).split('.').length > 1) {
+            for (let i = fraction.length - 1; i >= 0; i--) {
+                const index = new Decimal(money).mul(10).mul(Math.pow(10, i)).mod(10).toDP(0, Decimal.ROUND_DOWN).toNumber();
+                let decimal = digit[index] + fraction[i];
+                !chinese && (decimal = decimal.replace(/零./, ''));
+                chinese = decimal + chinese;
+            }
         }
         chinese = chinese || '整';
         money = Math.floor(money);
@@ -605,99 +768,98 @@ function TO_CAPITAL_RMB(money) {
 
 function DAY(date) {
     if (date === undefined || date === '' || date === null) {
-        return undefined;
+        return null;
     }
     const time = _dateFromAny(date);
-    const day = time ? time.getDate() : undefined;
-    return (day > 0) ? day : undefined;
+    const day = time ? time.getDate() : null;
+    return day > 0 ? day : null;
 }
 
 function MONTH(date) {
     if (date === undefined || date === '' || date === null) {
-        return undefined;
+        return null;
     }
     const time = _dateFromAny(date);
-    const month = time ? (time.getMonth() + 1) : undefined;
-    return (month > 0) ? month : undefined;
+    const month = time ? time.getMonth() + 1 : null;
+    return month > 0 ? month : null;
 }
 
 function YEAR(date: string | number | Date): number | undefined {
     if (date === undefined || date === '' || date === null) {
-        return undefined;
+        return null;
     }
     const time = _dateFromAny(date);
-    const year = time ? time.getFullYear() : undefined;
-    return (year > 0) ? year : undefined;
+    const year = time ? time.getFullYear() : null;
+    return year > 0 ? year : null;
 }
 
 function TODATE(year, month, day) {
 
-    const item = [{'key': year}, {'key': month}, {'key': day}];
+    const item = [year, month, day];
 
-    const result = item.filter(i => (i.key === undefined || i.key === '' || i.key === null || isNaN(i.key)));
+    const result = item.filter(i => i === undefined || i === '' || i === null || isNaN(i));
     if (result.length > 0) {
-        return 0;
+        return null;
+    }
+    if (year < 1 || month > 12 || month < 1 || day < 1 || day > 31) {
+        return null;
     }
     try {
         const date = new Date(Number(year), Number(month) - 1, Number(day));
-        const result = date.getTime();
-        if (result > 0) {
-            return result;
+        const timestamp = date.getTime();
+        if (timestamp > 0) {
+            return timestamp;
         }
     } catch (e) {
-        throw 'error';
+        return null
     }
-    return 0;
+    return null;
 }
 
 function THOUSANDSEP(number) {
     if (number === undefined || number === '' || number === null || isNaN(number)) {
-        return '';
+        return null;
     }
-    if (!defConfig.thousandFun) return '';
+    if (!defConfig.thousandFun) return null;
     return defConfig.thousandFun(number);
 }
 
 function MAX(...args: any[]): number {
     if (Array.isArray(args) && args.length === 0) {
-        throw new Error('缺少参数')
+        return null
     }
     // isNaN(null)的结果为false，Math.min函数认为null=0
-    const numArr = args.filter(item => !isNaN(item) && item !== null);
+    const numArr = args.filter(item => !isNaN(item) && item !== null && item !== undefined);
     if (numArr.length === 0) {
-        throw new Error('必须至少包含一个数值类型的参数');
+        return null;
     }
     return Math.max(...numArr);
 }
 
 function MIN(...args: any[]): number {
     if (Array.isArray(args) && args.length === 0) {
-        throw new Error('缺少参数')
+        return null;
     }
     // isNaN(null)的结果为false，Math.min函数认为null=0
-    const numArr = args.filter(item => !isNaN(item) && item !== null);
+    const numArr = args.filter(item => !isNaN(item) && item !== null && item !== undefined);
     if (numArr.length === 0) {
-        throw new Error('必须至少包含一个数值类型的参数');
+        return null;
     }
     return Math.min(...numArr);
 }
 
 function TOCAPITAL(number): string {
-    if (number === undefined || number === null || number === '') {
-        return '';
+    if (number === undefined || number === null || number === '' || isNaN(number)) {
+        return null;
     }
 
     try {
-        if (isNaN(number)) {
-            return '';
-        }
-
         const digit = [
             '零', '壹', '贰', '叁', '肆',
             '伍', '陆', '柒', '捌', '玖'
         ];
         const unit = [
-            ['', '万', '亿'],
+            ['', '万', '亿', '万'],
             ['', '拾', '佰', '仟']
         ];
         const head = number < 0 ? '负' : '';
@@ -708,12 +870,12 @@ function TOCAPITAL(number): string {
         let integerChinese = '';
         let decimalChinese = '';
         if (splitArr.length > 2) {
-            return '';
+            return null;
         } else if (splitArr.length === 2) {
-            integerNum = splitArr[0];
+            integerNum = Math.abs(splitArr[0]);
             decimalNum = splitArr[1];
         } else {
-            integerNum = splitArr[0];
+            integerNum = Math.abs(splitArr[0]);
         }
 
         if (Math.abs(number) >= 1) {
@@ -746,7 +908,7 @@ function TOCAPITAL(number): string {
 }
 
 /**
- * 返回{@param text}中，从{@param startPoint}开始的第一个{@param targetText}的位置
+ * 返回{@link text}中，从{@link startPoint}开始的第一个{@link targetText}的位置
  * @param targetText 目标字符串
  * @param text 原始字符串
  * @param startPoint 起始位置
@@ -754,19 +916,20 @@ function TOCAPITAL(number): string {
  * @return 位置下标，从0开始，未找到返回-1
  */
 function FIND(targetText: string, text: string, startPoint: number): number {
-    const item = [{'key': targetText}, {'key': text}, {'key': startPoint}];
-    const result = item.filter(i => (i.key === undefined || i.key === '' || i.key === null));
-    if (result.length > 0) {
-        return 0;
+    if (targetText == null || text == null || startPoint == null || isNaN(startPoint)) {
+        return null
     }
     targetText = targetText.toString();
     text = text.toString();
     if (startPoint > text.length) {
-        return 0;
+        return -1;
+    }
+    if (startPoint < 0) {
+        startPoint = 0;
     }
     const subStrtext = text.substring(startPoint, text.length);
     if (subStrtext.indexOf(targetText) === -1) {
-        return 0;
+        return -1;
     }
     return startPoint + subStrtext.indexOf(targetText);
 }
@@ -788,35 +951,41 @@ function CONTAINS(options: string[], field: string): boolean {
  */
 function TONUMBER(strNum: string): number {
     if (strNum === undefined || strNum === '' || strNum === null) {
-        return 0;
+        return null;
     }
     const result = Number(strNum);
-    return isNaN(result) ? 0 : result;
+    return isNaN(result) ? null : result;
 }
 
 function SLICE(text: string, startPoint: number, length: number): string {
-    text = text.toString();
-    const item = [{'key': text}, {'key': startPoint}, {'key': length}];
-    const result = item.filter(i => (i.key === undefined || i.key === '' || i.key === null));
-    if (result.length > 0) {
-        return '';
+    if (length == null || isNaN(length) || length < 0 || text == null || startPoint == null || isNaN(startPoint)) {
+        return null
     }
-    if (startPoint > text.length || text.length < startPoint + length) {
-        return '';
+    text = text.toString();
+    if (startPoint > text.length) {
+        return null;
+    }
+    if (startPoint < 0) {
+        startPoint = 0;
     }
     return text.slice(startPoint, startPoint + length);
 }
 
-function ID_TO_AGE(idCard: string): number | undefined {
-    if (idCard === undefined || idCard === '' || idCard === null) {
-        return undefined;
+function ID_TO_AGE(idCard: string): number | null {
+    if (idCard === undefined || idCard === null) {
+        return null;
     }
     idCard = idCard.toString();
     const len = idCard.length;
     if (!(len === 15 || len === 18)) {
-        return undefined;
+        return null;
+    }
+    const idCardReg = /^\d{6}(((19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])\d{3}([0-9]|x|X))|(\d{2}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])\d{3}))$/;
+    if (!(idCardReg.test(idCard) || idCard.length == 17 && idCardReg.test(idCard.substring(0, 15)))) {
+        return null;
     }
     const birth = idCard.length === 18 ? idCard.slice(6, 14) : idCard.slice(6, 12);
+    // eslint-disable-next-line init-declarations
     let year, month, day;
     if (birth.length === 8) {
         year = parseInt(birth.slice(0, 4), 10);
@@ -827,21 +996,20 @@ function ID_TO_AGE(idCard: string): number | undefined {
         month = parseInt(birth.slice(2, 4), 10);
         day = parseInt(birth.slice(-2), 10);
     } else {
-        return undefined;
+        return null;
     }
     if (isNaN(month) || isNaN(day) || month > 12 || month === 0 || day > 31 || day === 0) {
-        return undefined;
+        return null;
     }
     const date = new Date();
     const currentTimestamp = date.getTime();
-
     const currentYear = date.getFullYear();
     const birthDay = currentYear + '-' + `${month}-${day}`;
     const birthdayTimestamp = new Date(birthDay).getTime();
     let old = 0;
-    if ((currentYear - year) > 0) {
-        ((birthdayTimestamp < currentTimestamp)) ? (old = currentYear - year) :
-            (old = currentYear - year - 1)
+    if (currentYear - year > 0) {
+        birthdayTimestamp < currentTimestamp ? old = currentYear - year :
+            old = currentYear - year - 1
     }
     return old;
 }
@@ -854,9 +1022,12 @@ function ID_TO_AGE(idCard: string): number | undefined {
  */
 function WEEKDAY(date: number, return_type: 1 | 2 | 3 = 1): number {
     if (typeof date !== 'number') {
-        throw new Error('非法的参数类型：' + typeof date)
+        return null
     }
     const result = _dateFromAny(date);
+    if (result == null) {
+        return null;
+    }
     const weekDay = result.getDay();
     if (return_type === 1) {
         return weekDay + 1
@@ -864,17 +1035,26 @@ function WEEKDAY(date: number, return_type: 1 | 2 | 3 = 1): number {
         return weekDay === 0 ? 7 : weekDay;
     } else if (return_type === 3) {
         return (weekDay + 6) % 7
+    } else {
+        return weekDay + 1
     }
-    return weekDay;// 0-6 从星期日开始
+}
+
+function TOTIMESTAMP(date: number | string | Date): number {
+    const result = _dateFromAny(date);
+    if (result == null) {
+        return null;
+    }
+    return result.getTime();
 }
 
 function DATEVALUE(text: string | number | Date): string {
     if (text === undefined || text === '' || text === null) {
-        return '';
+        return null;
     }
     const result = _dateFromAny(text);
     if (!result || isNaN(result.getTime())) {
-        return '';
+        return null;
     }
     try {
         const time = new Date(result.getTime());
@@ -883,7 +1063,7 @@ function DATEVALUE(text: string | number | Date): string {
         const day = time.getDate();
         return year + '年' + month + '月' + day + '日';
     } catch (e) {
-        return '';
+        return null;
     }
 }
 

@@ -2,3 +2,4 @@ node_modules
 package-lock.json
 yarn.lock
 .idea
+__test__/function/函数公式.json
