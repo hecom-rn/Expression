@@ -2,7 +2,7 @@ import Expression, {FuncTypeMap} from '../src/index';
 import {advanceTo, clear} from 'jest-date-mock';
 import Sval, {SvalOptions} from "sval";
 
-function expression(content: string, data?: any, fieldNames?: any) {
+function expression(content: string, data?: any) {
     // return Expression.calculate('${' + content + '}', fieldNames, data);
     return Expression.calculateFast(content, data);
 }
@@ -73,9 +73,9 @@ function initExpression() {
             num = Math.round(num);
             return (num + '').replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g, '$1,');
         },
-        eval: (expr, bizData, {null2Zero, otherVars, objectType}) => {
+        eval: (expr, bizData, {null2Zero, otherVars}) => {
             interpreter.import({bizData, ...otherVars});
-            interpreter.run(`exports.result=${expr}`, {null2Zero, funcTypeMap: FuncTypeMap, objectType});
+            interpreter.run(`exports.result=${expr}`, {null2Zero, funcTypeMap: FuncTypeMap});
             return interpreter.exports.result;
         },
     };
@@ -85,11 +85,13 @@ function initExpression() {
 describe('多变量测试', () => {
     beforeAll(initExpression);
     it('多变量测试', () => {
+        // eslint-disable-next-line no-template-curly-in-string
         const result = Expression.calculate('${bizData.a + other.b + c.d}', [], {a: 1},
             {otherVars: {other: {b: 1}, c: {d: 1}}})
         expect(result).toEqual(3)
     })
     it('未传多变量参数', () => {
+        // eslint-disable-next-line no-template-curly-in-string
         const result = Expression.calculate('${bizData.a + bizData.b + bizData.d}', [], {a: 1, b: 1, d: 1})
         expect(result).toEqual(3)
     })
@@ -634,7 +636,7 @@ describe('formula', () => {
         ];
 
         testData.forEach(({date, type, result}) => {
-            let expectResult;
+            let expectResult = null;
             if (type) {
                 expectResult = expect(expression(`WEEKDAY(${date}, ${type})`));
             } else {

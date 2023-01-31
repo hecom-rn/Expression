@@ -37,7 +37,7 @@
     "jest-runner-tsc": "^1.6.0",
     "jest-sonar": "^0.2.12",
     "node-xlsx": "^0.21.0",
-    "sval": "https://github.com/hecom-rn/sval.git#535e24b355ca6f04f4bdc3b086b0e45078b95eca",
+    "sval": "https://github.com/hecom-rn/sval.git#e94db558f114e3f80d362b92de7428f704631e8c",
     "ts-jest": "^26.1.4",
     "tslint": "^5.18.0",
     "typescript": "^4.1.3"
