@@ -24,11 +24,11 @@ const convert = (value) => {
     }
 };
 const keys = ['返回值', '参数1', '参数2', '参数3', '参数4', '参数5'];
-csv()
+csv({trim: false})
     .fromFile(csvFilePath)
     .then((data) => {
         data.forEach(json => {
-            if (json['编号']) {
+            if (json['编号'] && json['不适用（0：不适用前端，1：不适用后端）'] !== '0') {
                 all.push(Object.keys(json).reduce((pre, cur) => {
                     if (cur === '编号') {
                         pre.code = json[cur]

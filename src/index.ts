@@ -802,6 +802,19 @@ function TODATE(year, month, day) {
     if (year < 1 || month > 12 || month < 1 || day < 1 || day > 31) {
         return null;
     }
+    if (day > 28) {
+        let limit = 31;
+        if (month == 2) {
+            const isLeapYear = year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
+            limit = isLeapYear ? 29 : 28;
+        } else {
+            const monthDayLimit = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+            limit = monthDayLimit[month - 1];
+        }
+        if (day > limit) {
+            return null
+        }
+    }
     try {
         const date = new Date(Number(year), Number(month) - 1, Number(day));
         const timestamp = date.getTime();

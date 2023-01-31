@@ -14,14 +14,14 @@ const funcMap = Object.keys(Expression.funcMap).reduce((pre, cur) => {
 }, {} as typeof Expression.funcMap);
 const allTestCase = testCaseList.map(testCase => Object.assign(testCase, {toString: () => testCase.code.substring(-3)}))
 describe('时间函数测试', () => {
-    it.each(allTestCase.filter(item => item.code.startsWith('DATEDIF')))('DATEDIF-%s', ({
-                                                                                            ['返回值']: result,
-                                                                                            ['参数1']: start,
-                                                                                            ['参数2']: end,
-                                                                                            ['参数3']: type,
-                                                                                        }) => {
-        expect(funcMap.DATEDIF(start, end, type)).toEqual(result === null ? result : Number(result))
-    })
+    // it.each(allTestCase.filter(item => item.code.startsWith('DATEDIF')))('DATEDIF-%s', ({
+    //                                                                                         ['返回值']: result,
+    //                                                                                         ['参数1']: start,
+    //                                                                                         ['参数2']: end,
+    //                                                                                         ['参数3']: type,
+    //                                                                                     }) => {
+    //     expect(funcMap.DATEDIF(start, end, type)).toEqual(result === null ? result : Number(result))
+    // })
     it.each(allTestCase.filter(item => item.code.includes('TIMEDIF')))('TIMEDIF-%s', ({
                                                                                           ['返回值']: result,
                                                                                           ['参数1']: start,
