@@ -1,6 +1,6 @@
 import Decimal from "decimal.js";
 import moment from "moment";
-import {FunctionTypeMap, ObjectType, TYPE} from "sval";
+import {FunctionTypeMap, TYPE} from "sval";
 
 export type AnalyzeResult = string[];
 
@@ -20,7 +20,7 @@ interface User {
 interface Config {
     currentUser?: () => User;
     eval?: (expr: string, bizData: object, config?: {
-        null2Zero?: boolean, otherVars?: object, objectType: ObjectType
+        null2Zero?: boolean, otherVars?: object
     }) => any;
     superiors?: () => User;
     thousandFun?: (num: number) => string;
@@ -57,12 +57,11 @@ function _calculateFast(exprStr: string, data?, {
     throwException = false,
     null2Zero = false,
     otherVars = null,
-    objectType = null,
 } = {}): any {
     let result = null;
     try {
         if (defConfig.eval) {
-            result = defConfig.eval(exprStr, data, {null2Zero, otherVars, objectType})
+            result = defConfig.eval(exprStr, data, {null2Zero, otherVars})
         } else {
             eval('result = ' + exprStr);
         }
@@ -93,14 +92,13 @@ function _calculate(exprStr: string, fieldnames?: string[], data?, {
     throwException = false,
     null2Zero = false,
     otherVars = null,
-    objectType = null,
 } = {}): any {
     const expr = exprStr.slice(2, exprStr.length - 1);
     let result = null;
     try {
         const bizData = Object.assign({}, data);
         if (defConfig.eval) {
-            result = defConfig.eval(expr, bizData, {null2Zero, otherVars, objectType})
+            result = defConfig.eval(expr, bizData, {null2Zero, otherVars})
         } else {
             eval('result = ' + expr);
         }
