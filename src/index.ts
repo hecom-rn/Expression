@@ -1,6 +1,6 @@
 import Decimal from "decimal.js";
 import moment from "moment";
-import {FunctionTypeMap, TYPE} from "sval";
+import { FunctionTypeMap, TYPE } from "sval";
 
 export type AnalyzeResult = string[];
 
@@ -39,7 +39,7 @@ function setConfig(config: Config) {
  */
 function setThousandFun(thousandFun: Function) {
     console.warn('setThousandFun已废弃，请直接使用setConfig函数进行统一初始化');
-    Object.assign(defConfig, {thousandFun})
+    Object.assign(defConfig, { thousandFun })
 }
 
 /**
@@ -61,7 +61,7 @@ function _calculateFast(exprStr: string, data?, {
     let result = null;
     try {
         if (defConfig.eval) {
-            result = defConfig.eval(exprStr, data, {null2Zero, otherVars})
+            result = defConfig.eval(exprStr, data, { null2Zero, otherVars })
         } else {
             eval('result = ' + exprStr);
         }
@@ -98,7 +98,7 @@ function _calculate(exprStr: string, fieldnames?: string[], data?, {
     try {
         const bizData = Object.assign({}, data);
         if (defConfig.eval) {
-            result = defConfig.eval(expr, bizData, {null2Zero, otherVars})
+            result = defConfig.eval(expr, bizData, { null2Zero, otherVars })
         } else {
             eval('result = ' + expr);
         }
@@ -261,28 +261,28 @@ const _DefaultExpressionFuncs = {
 
 export const FuncTypeMap: FunctionTypeMap = {
     // 文本函数
-    LEFT: {name: 'LEFT', returnType: TYPE.STRING, argsType: (i) => i == 0 ? TYPE.STRING : TYPE.NUMBER},
-    RIGHT: {name: 'RIGHT', returnType: TYPE.STRING, argsType: (i) => i == 0 ? TYPE.STRING : TYPE.NUMBER},
-    SEARCH: {name: 'SEARCH', returnType: TYPE.BOOLEAN, argsType: () => TYPE.STRING},
-    CONCATENATE: {name: 'CONCATENATE', returnType: TYPE.STRING, argsType: () => TYPE.ANY},
-    TEXT: {name: 'TEXT', returnType: TYPE.STRING, argsType: () => TYPE.ANY},
-    TOCAPITAL: {name: 'TOCAPITAL', returnType: TYPE.STRING, argsType: () => TYPE.NUMBER},
-    TO_CAPITAL_RMB: {name: 'TO_CAPITAL_RMB', returnType: TYPE.STRING, argsType: () => TYPE.NUMBER},
-    FIND: {name: 'FIND', returnType: TYPE.NUMBER, argsType: (i) => i == 0 || i == 1 ? TYPE.STRING : TYPE.NUMBER},
-    SLICE: {name: 'SLICE', returnType: TYPE.STRING, argsType: (i) => i == 0 ? TYPE.STRING : TYPE.NUMBER},
-    ID_TO_AGE: {name: 'ID_TO_AGE', returnType: TYPE.NUMBER, argsType: () => TYPE.STRING},
-    TONUMBER: {name: 'TONUMBER', returnType: TYPE.NUMBER, argsType: () => TYPE.STRING},
+    LEFT: { name: 'LEFT', returnType: TYPE.STRING, argsType: (i) => i == 0 ? TYPE.STRING : TYPE.NUMBER },
+    RIGHT: { name: 'RIGHT', returnType: TYPE.STRING, argsType: (i) => i == 0 ? TYPE.STRING : TYPE.NUMBER },
+    SEARCH: { name: 'SEARCH', returnType: TYPE.BOOLEAN, argsType: () => TYPE.STRING },
+    CONCATENATE: { name: 'CONCATENATE', returnType: TYPE.STRING, argsType: () => TYPE.ANY },
+    TEXT: { name: 'TEXT', returnType: TYPE.STRING, argsType: () => TYPE.ANY },
+    TOCAPITAL: { name: 'TOCAPITAL', returnType: TYPE.STRING, argsType: () => TYPE.NUMBER },
+    TO_CAPITAL_RMB: { name: 'TO_CAPITAL_RMB', returnType: TYPE.STRING, argsType: () => TYPE.NUMBER },
+    FIND: { name: 'FIND', returnType: TYPE.NUMBER, argsType: (i) => i == 0 || i == 1 ? TYPE.STRING : TYPE.NUMBER },
+    SLICE: { name: 'SLICE', returnType: TYPE.STRING, argsType: (i) => i == 0 ? TYPE.STRING : TYPE.NUMBER },
+    ID_TO_AGE: { name: 'ID_TO_AGE', returnType: TYPE.NUMBER, argsType: () => TYPE.STRING },
+    TONUMBER: { name: 'TONUMBER', returnType: TYPE.NUMBER, argsType: () => TYPE.STRING },
     // 逻辑函数
-    AND: {name: 'AND', returnType: TYPE.BOOLEAN, argsType: () => TYPE.BOOLEAN},
-    OR: {name: 'OR', returnType: TYPE.BOOLEAN, argsType: () => TYPE.BOOLEAN},
-    IF: {name: 'IF', returnType: TYPE.ANY, argsType: (i) => i == 0 ? TYPE.BOOLEAN : TYPE.ANY},
-    FirstNotNull: {name: 'FirstNotNull', returnType: TYPE.ANY, argsType: () => TYPE.ANY},
-    TRUE: {name: 'TRUE', returnType: TYPE.BOOLEAN, argsType: null},
-    FALSE: {name: 'FALSE', returnType: TYPE.BOOLEAN, argsType: null},
-    isNotNULL: {name: 'isNotNULL', returnType: TYPE.BOOLEAN, argsType: () => TYPE.ANY},
-    ISNOTNULL: {name: 'ISNOTNULL', returnType: TYPE.BOOLEAN, argsType: () => TYPE.ANY},
-    isNULL: {name: 'isNULL', returnType: TYPE.BOOLEAN, argsType: () => TYPE.ANY},
-    ISNULL: {name: 'ISNULL', returnType: TYPE.BOOLEAN, argsType: () => TYPE.ANY},
+    AND: { name: 'AND', returnType: TYPE.BOOLEAN, argsType: () => TYPE.BOOLEAN },
+    OR: { name: 'OR', returnType: TYPE.BOOLEAN, argsType: () => TYPE.BOOLEAN },
+    IF: { name: 'IF', returnType: TYPE.ANY, argsType: (i) => i == 0 ? TYPE.BOOLEAN : TYPE.ANY },
+    FirstNotNull: { name: 'FirstNotNull', returnType: TYPE.ANY, argsType: () => TYPE.ANY },
+    TRUE: { name: 'TRUE', returnType: TYPE.BOOLEAN, argsType: null },
+    FALSE: { name: 'FALSE', returnType: TYPE.BOOLEAN, argsType: null },
+    isNotNULL: { name: 'isNotNULL', returnType: TYPE.BOOLEAN, argsType: () => TYPE.ANY },
+    ISNOTNULL: { name: 'ISNOTNULL', returnType: TYPE.BOOLEAN, argsType: () => TYPE.ANY },
+    isNULL: { name: 'isNULL', returnType: TYPE.BOOLEAN, argsType: () => TYPE.ANY },
+    ISNULL: { name: 'ISNULL', returnType: TYPE.BOOLEAN, argsType: () => TYPE.ANY },
     // 时间函数
     TIMEDIF: {
         name: 'TIMEDIF',
@@ -294,8 +294,8 @@ export const FuncTypeMap: FunctionTypeMap = {
         returnType: TYPE.NUMBER,
         argsType: (i) => i == 0 || i == 1 ? TYPE.DATETIME : TYPE.STRING
     },
-    TODAY: {name: 'TODAY', returnType: TYPE.DATETIME, argsType: null},
-    NOW: {name: 'NOW', returnType: TYPE.DATETIME, argsType: null},
+    TODAY: { name: 'TODAY', returnType: TYPE.DATETIME, argsType: null },
+    NOW: { name: 'NOW', returnType: TYPE.DATETIME, argsType: null },
     DATEOFFSET: {
         name: 'DATEOFFSET',
         returnType: TYPE.DATETIME,
@@ -306,24 +306,24 @@ export const FuncTypeMap: FunctionTypeMap = {
         returnType: TYPE.DATETIME,
         argsType: (i) => i == 0 ? TYPE.DATETIME : i == 1 ? TYPE.STRING : TYPE.NUMBER
     },
-    DAY: {name: 'DAY', returnType: TYPE.NUMBER, argsType: () => TYPE.DATETIME},
-    MONTH: {name: 'MONTH', returnType: TYPE.NUMBER, argsType: () => TYPE.DATETIME},
-    YEAR: {name: 'YEAR', returnType: TYPE.NUMBER, argsType: () => TYPE.DATETIME},
-    TODATE: {name: 'TODATE', returnType: TYPE.DATETIME, argsType: () => TYPE.NUMBER},
-    DATEVALUE: {name: 'DATEVALUE', returnType: TYPE.STRING, argsType: () => TYPE.DATETIME},
-    WEEKDAY: {name: 'WEEKDAY', returnType: TYPE.NUMBER, argsType: (i) => i == 0 ? TYPE.DATETIME : TYPE.NUMBER},
+    DAY: { name: 'DAY', returnType: TYPE.NUMBER, argsType: () => TYPE.DATETIME },
+    MONTH: { name: 'MONTH', returnType: TYPE.NUMBER, argsType: () => TYPE.DATETIME },
+    YEAR: { name: 'YEAR', returnType: TYPE.NUMBER, argsType: () => TYPE.DATETIME },
+    TODATE: { name: 'TODATE', returnType: TYPE.DATETIME, argsType: () => TYPE.NUMBER },
+    DATEVALUE: { name: 'DATEVALUE', returnType: TYPE.STRING, argsType: () => TYPE.DATETIME },
+    WEEKDAY: { name: 'WEEKDAY', returnType: TYPE.NUMBER, argsType: (i) => i == 0 ? TYPE.DATETIME : TYPE.NUMBER },
     // 数学函数
-    ABS: {name: 'ABS', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER},
-    CEILING: {name: 'CEILING', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER},
-    FLOOR: {name: 'FLOOR', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER},
-    LN: {name: 'LN', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER},
-    LOG: {name: 'LOG', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER},
-    MOD: {name: 'MOD', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER},
-    ROUND: {name: 'ROUND', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER},
-    SQRT: {name: 'SQRT', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER},
-    THOUSANDSEP: {name: 'THOUSANDSEP', returnType: TYPE.STRING, argsType: () => TYPE.NUMBER},
-    MAX: {name: 'MAX', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER},
-    MIN: {name: 'MIN', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER},
+    ABS: { name: 'ABS', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER },
+    CEILING: { name: 'CEILING', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER },
+    FLOOR: { name: 'FLOOR', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER },
+    LN: { name: 'LN', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER },
+    LOG: { name: 'LOG', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER },
+    MOD: { name: 'MOD', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER },
+    ROUND: { name: 'ROUND', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER },
+    SQRT: { name: 'SQRT', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER },
+    THOUSANDSEP: { name: 'THOUSANDSEP', returnType: TYPE.STRING, argsType: () => TYPE.NUMBER },
+    MAX: { name: 'MAX', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER },
+    MIN: { name: 'MIN', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER },
 
 }
 
@@ -352,7 +352,9 @@ function isNULL(value) {
 }
 
 function ISNULL(value) {
-    return value == null || typeof value === 'number' && isNaN(value) || Array.isArray(value) && value.length === 0;
+    return value === null || value === undefined || value === '' ||
+        typeof value === 'number' && isNaN(value) ||
+        value && value.toString() === '' || Array.isArray(value) && value.length === 0;
 }
 
 function INVERT(value) {
@@ -695,7 +697,7 @@ function CURRENT_USER() {
 
 function CURRENT_ORG() {
     if (!defConfig.currentUser) return;
-    const {dept} = defConfig.currentUser();
+    const { dept } = defConfig.currentUser();
     return {
         code: dept.code,
         name: dept.name,
@@ -903,7 +905,18 @@ function TOCAPITAL(number): string {
         }
 
         if (decimalNum) {
-            const digitMap = {0: '零', 1: '壹', 2: '贰', 3: '叁', 4: '肆', 5: '伍', 6: '陆', 7: '柒', 8: '捌', 9: '玖'};
+            const digitMap = {
+                0: '零',
+                1: '壹',
+                2: '贰',
+                3: '叁',
+                4: '肆',
+                5: '伍',
+                6: '陆',
+                7: '柒',
+                8: '捌',
+                9: '玖'
+            };
             decimalNum.split('').forEach(item => {
                 decimalChinese = decimalChinese + digitMap[item];
             });

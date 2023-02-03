@@ -163,24 +163,24 @@ describe('formula', () => {
     });
 
     test('ISNOTNULL', () => {
-        const truthy = [true, 12, 0, false, "{}", "'0'", '""'];
+        const truthy = [true, 12, 0, false, "{}", "'0'"];
         truthy.forEach(item => {
             const result = expression(`ISNOTNULL(${item})`);
             expect(result).toBeTruthy();
         });
-        const falsy = [null, undefined, []]
+        const falsy = [null, '""', undefined, []]
         falsy.forEach(item => {
             const result = expression(`ISNOTNULL(${item})`);
             expect(result).toBeFalsy();
         })
     });
     test('ISNULL', () => {
-        const falsy = ['true', '12', '0', 'false', '{}', "''"];
+        const falsy = ['true', '12', '0', 'false', '{}'];
         falsy.forEach(item => {
             const result = expression(`ISNULL(${item})`);
             expect(result).toBeFalsy();
         });
-        const truthy = [null, undefined, '[]', 'NaN']
+        const truthy = [null, "''", undefined, '[]', 'NaN']
         truthy.forEach(item => {
             const result = expression(`ISNULL(${item})`);
             expect(result).toBeTruthy();
@@ -431,9 +431,9 @@ describe('formula', () => {
 
         const dateArr = [
             {key: [-23, 0], value: -23},
-            {key: ['""', '1', 'undefined', 0, 3214, -6123599], value: ''},
+            {key: ['""', '1', 'undefined', 0, 3214, -6123599], value: 1},
             {key: ['[]', 90, 'undefined', 0, 'undefined', 61235], value: 90},
-            {key: ['[]', 'undefined', 'null'], value: null},
+            {key: ['""', '[]', 'undefined', 'null'], value: null},
             {key: ['NaN', '120'], value: 120},
         ];
         dateArr.forEach(item => {
