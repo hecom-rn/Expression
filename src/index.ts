@@ -275,7 +275,7 @@ export const FuncTypeMap: FunctionTypeMap = {
     // 逻辑函数
     AND: {name: 'AND', returnType: TYPE.BOOLEAN, argsType: () => TYPE.BOOLEAN},
     OR: {name: 'OR', returnType: TYPE.BOOLEAN, argsType: () => TYPE.BOOLEAN},
-    IF: {name: 'IF', returnType: TYPE.ANY, argsType: (index) => index == 1 ? TYPE.BOOLEAN : TYPE.ANY},
+    IF: {name: 'IF', returnType: TYPE.ANY, argsType: (i) => i == 0 ? TYPE.BOOLEAN : TYPE.ANY},
     FirstNotNull: {name: 'FirstNotNull', returnType: TYPE.ANY, argsType: () => TYPE.ANY},
     TRUE: {name: 'TRUE', returnType: TYPE.BOOLEAN, argsType: null},
     FALSE: {name: 'FALSE', returnType: TYPE.BOOLEAN, argsType: null},
