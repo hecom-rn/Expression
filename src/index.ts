@@ -26,6 +26,14 @@ interface Config {
     thousandFun?: (num: number) => string;
 }
 
+interface CalculateOption {
+    useNull?: boolean;
+    throwException?: boolean;
+    null2Zero?: boolean;
+    otherVars?: any,
+    evalParam?: any,
+}
+
 let defConfig: Config = {};
 
 function setConfig(config: Config) {
@@ -51,17 +59,19 @@ function setThousandFun(thousandFun: Function) {
  * @param throwException 计算失败时是否抛出异常
  * @param null2Zero 参与计算的值为空时，是否转0
  * @param otherVars 多变量
+ * @param evalParam eval函数扩展参数
  */
 function _calculateFast(exprStr: string, data?, {
     useNull = false,
     throwException = false,
     null2Zero = false,
     otherVars = null,
-} = {}): any {
+    evalParam,
+}: CalculateOption = {}): any {
     let result = null;
     try {
         if (defConfig.eval) {
-            result = defConfig.eval(exprStr, data, { null2Zero, otherVars })
+            result = defConfig.eval(exprStr, data, { null2Zero, otherVars, ...evalParam })
         } else {
             eval('result = ' + exprStr);
         }
@@ -92,13 +102,14 @@ function _calculate(exprStr: string, fieldnames?: string[], data?, {
     throwException = false,
     null2Zero = false,
     otherVars = null,
-} = {}): any {
+    evalParam
+}: CalculateOption = {}): any {
     const expr = exprStr.slice(2, exprStr.length - 1);
     let result = null;
     try {
         const bizData = Object.assign({}, data);
         if (defConfig.eval) {
-            result = defConfig.eval(expr, bizData, { null2Zero, otherVars })
+            result = defConfig.eval(expr, bizData, { null2Zero, otherVars, ...evalParam })
         } else {
             eval('result = ' + expr);
         }
