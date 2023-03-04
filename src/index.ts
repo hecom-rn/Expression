@@ -17,11 +17,12 @@ interface User {
     toString?(): string
 }
 
+
 interface Config {
     currentUser?: () => User;
-    eval?: (expr: string, bizData: object, config?: {
-        null2Zero?: boolean, otherVars?: object
-    }) => any;
+    eval?: <T>(expr: string, bizData: object, config?: {
+        null2Zero?: boolean, otherVars?: object,
+    } & T) => any;
     superiors?: () => User;
     thousandFun?: (num: number) => string;
 }
