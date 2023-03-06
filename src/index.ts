@@ -18,7 +18,7 @@ interface User {
 }
 
 
-interface Config {
+export interface Config {
     currentUser?: () => User;
     eval?: <T>(expr: string, bizData: object, config?: {
         null2Zero?: boolean, otherVars?: object,
@@ -425,7 +425,7 @@ function MOD(number, divisor) {
     if (number == null || isNaN(number) || divisor == null || isNaN(divisor)) {
         return null;
     }
-    const result = number % divisor;
+    const result = new Decimal(number).mod(divisor).toNumber();
     if (result === Infinity || result === -Infinity || isNaN(result)) {
         return null;
     }

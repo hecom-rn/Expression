@@ -1,4 +1,4 @@
-import Expression, {FuncTypeMap} from '../src/index';
+import Expression, {FuncTypeMap, Config} from '../src/index';
 import {advanceTo, clear} from 'jest-date-mock';
 import Sval, {SvalOptions} from "sval";
 
@@ -66,7 +66,7 @@ function initExpression() {
     } as SvalOptions;
     const interpreter = new Sval(options);
     interpreter.import(Expression.funcMap);
-    const callbackFuncMap = {
+    const callbackFuncMap: Config = {
         currentUser: () => user,
         superiors: () => user.owner,
         thousandFun: (num) => {
