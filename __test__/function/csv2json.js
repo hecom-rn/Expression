@@ -1,5 +1,5 @@
-const csvFilePath = '/Users/summer/Documents/GitHub/Expression/__test__/function/函数公式.csv'
-const jsonFilePath = '/Users/summer/Documents/GitHub/Expression/__test__/function/函数公式.json'
+const csvFilePath = './__test__/function/函数公式.csv'
+const jsonFilePath = './__test__/function/函数公式.json'
 const csv = require('csvtojson');
 const fs = require('fs')
 
