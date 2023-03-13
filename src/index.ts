@@ -606,7 +606,7 @@ function DATEOFFSET(startDateTimestamp, unit, value) {
 }
 
 function AND(...args: any[]) {
-    if (args.some(arg => typeof arg != 'boolean')) {
+    if (args.some(arg => arg != null && typeof arg != 'boolean' && arg !== 0 && arg !== 1)) {
         return null;
     }
     let result = true;
@@ -617,7 +617,7 @@ function AND(...args: any[]) {
 }
 
 function OR(...args: any[]) {
-    if (args.some(arg => typeof arg != 'boolean')) {
+    if (args.some(arg => arg != null && typeof arg != 'boolean' && arg !== 0 && arg !== 1)) {
         return null;
     }
     let result = false;
@@ -628,7 +628,7 @@ function OR(...args: any[]) {
 }
 
 function IF(logicalTest, valueIfTrue, valueIfFalse) {
-    if (logicalTest != null && typeof logicalTest != "boolean") {
+    if (logicalTest != null && typeof logicalTest != "boolean" && logicalTest !== 0 && logicalTest !== 1) {
         return null;
     }
     return logicalTest ? valueIfTrue : valueIfFalse;
