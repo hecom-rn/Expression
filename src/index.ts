@@ -832,13 +832,10 @@ function TODATE(year, month, day) {
     try {
         const date = new Date(Number(year), Number(month) - 1, Number(day));
         const timestamp = date.getTime();
-        if (timestamp > 0) {
-            return timestamp;
-        }
+        return timestamp;
     } catch (e) {
         return null
     }
-    return null;
 }
 
 function THOUSANDSEP(number) {
