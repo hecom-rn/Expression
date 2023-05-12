@@ -267,7 +267,7 @@ const _DefaultExpressionFuncs = {
     // 数学函数
     ABS, CEILING, FLOOR, LN, LOG, MOD, ROUND, SQRT, THOUSANDSEP, MAX, MIN,
     // 时间函数
-    TIMEDIF, DATEDIF, TODAY, NOW, DATEOFFSET, TIMEOFFSET, DAY, MONTH, YEAR, TODATE, DATEVALUE, WEEKDAY, TOTIMESTAMP,
+    TIMEDIF, DATEDIF, DATEDIFV2, TODAY, NOW, DATEOFFSET, TIMEOFFSET, DAY, MONTH, YEAR, TODATE, DATEVALUE, WEEKDAY, TOTIMESTAMP,
     // 逻辑函数
     AND, OR, IF, FirstNotNull, TRUE, FALSE, CASE, NULL, ISNOTNULL, ISNULL, isNULL, isNotNULL, CONTAINS, INVERT,
     // 文本函数
@@ -307,6 +307,11 @@ export const FuncTypeMap: FunctionTypeMap = {
     },
     DATEDIF: {
         name: 'DATEDIF',
+        returnType: TYPE.NUMBER,
+        argsType: (i) => i == 0 || i == 1 ? TYPE.DATETIME : TYPE.STRING
+    },
+    DATEDIFV2:{
+        name: 'DATEDIFV2',
         returnType: TYPE.NUMBER,
         argsType: (i) => i == 0 || i == 1 ? TYPE.DATETIME : TYPE.STRING
     },
@@ -489,6 +494,31 @@ function TIMEDIF(startTime, endTime, unit) {
         return null;
     } catch (e) {
         return null
+    }
+}
+
+function DATEDIFV2(startTime, endTime, unit) {
+    try {
+        if (startTime == null || startTime == null || unit == null) {
+            return null;
+        }
+        const startDate = moment(startTime).startOf('day');
+        const endDate = moment(endTime).startOf('day');
+        if (!startDate.isValid() || !endDate.isValid()) {
+            return null;
+        }
+        if (unit === 'Y' || unit === 'y') {
+            return endDate.diff(startDate, 'year');
+        } else if (unit === 'M') {
+            return endDate.diff(startDate, 'month');
+        } else if (unit === 'D' || unit === 'd') {
+            return endDate.diff(startDate, 'day');
+        } else {
+            return null;
+        }
+    } catch (e) {
+        console.warn('DATEDIF error', e.toString());
+        return null;
     }
 }
 
