@@ -72,11 +72,7 @@ function _calculateFast(exprStr: string, data?, {
     let result = null;
     try {
         if (defConfig.eval) {
-            let str = exprStr;
-            if (exprStr?.length > 0) {
-                str = exprStr.replace(/\n/g, '\\n');
-            }
-            result = defConfig.eval(str, data, { null2Zero, otherVars, ...evalParam })
+            result = defConfig.eval(exprStr, data, { null2Zero, otherVars, ...evalParam })
         } else {
             eval('result = ' + exprStr);
         }

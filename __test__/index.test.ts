@@ -655,3 +655,18 @@ describe('formula', () => {
 
     })
 });
+
+describe('换行符测试', () => {
+    beforeAll(initExpression);
+    it('字符串内换行', () => {
+        let expr = "＄{\"\\n身份证号\\n职位\"}";
+        expr = expr.slice(2, expr.length - 1)
+        expect(expression(expr)).toEqual('\n身份证号\n职位');
+    });
+    it('字符串外换行', () => {
+        // eslint-disable-next-line no-template-curly-in-string
+        let expr = "${'生日' + \n'身份证号' + \n'职位'}";
+        expr = expr.slice(2, expr.length - 1)
+        expect(expression(expr)).toEqual('生日身份证号职位');
+    });
+});
