@@ -45,7 +45,7 @@ function initExpression() {
         },
     };
     Expression.setConfig(callbackFuncMap);
-    initJexl();
+    initSval();
 }
 
 function initSval(){
