@@ -1,8 +1,25 @@
 import Decimal from "decimal.js";
 import moment from "moment";
-import { FunctionTypeMap, TYPE } from "sval";
 
 export type AnalyzeResult = string[];
+
+export enum TYPE {
+    ANY,
+    STRING,
+    NUMBER,
+    BOOLEAN,
+    DATETIME,
+}
+
+export interface FunctionType {
+    name: string;
+    returnType: TYPE;
+    argsType: (index: number) => TYPE;
+}
+
+export interface FunctionTypeMap {
+    [name: string]: FunctionType
+}
 
 interface User {
     code: string
