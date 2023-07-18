@@ -74,7 +74,7 @@ function _calculateFast(exprStr: string, data?, {
         if (defConfig.eval) {
             result = defConfig.eval(exprStr, data, { null2Zero, otherVars, ...evalParam })
         } else {
-            eval('result = ' + exprStr);
+            console.warn('未配置执行函数，无法完成计算');
         }
         if (useNull && result === undefined) {
             result = null;
@@ -112,7 +112,7 @@ function _calculate(exprStr: string, fieldnames?: string[], data?, {
         if (defConfig.eval) {
             result = defConfig.eval(expr, bizData, { null2Zero, otherVars, ...evalParam })
         } else {
-            eval('result = ' + expr);
+            console.warn('未配置执行函数，无法完成计算');
         }
         if (useNull && result === undefined) {
             result = null;

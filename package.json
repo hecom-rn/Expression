@@ -36,6 +36,8 @@
     "jest-runner-prettier": "^0.3.6",
     "jest-runner-tsc": "^1.6.0",
     "jest-sonar": "^0.2.12",
+    "jexl": "^2.3.0",
+    "mozjexl": "^1.1.6",
     "node-xlsx": "^0.21.0",
     "sval": "https://github.com/hecom-rn/sval.git#e94db558f114e3f80d362b92de7428f704631e8c",
     "ts-jest": "^26.1.4",

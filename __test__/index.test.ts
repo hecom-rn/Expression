@@ -1,6 +1,7 @@
-import Expression, { FuncTypeMap, Config } from '../src/index';
+import Expression, { Config, FuncTypeMap } from '../src/index';
 import { advanceTo, clear } from 'jest-date-mock';
 import Sval, { SvalOptions } from "sval";
+import jexl from 'jexl';
 
 function expression(content: string, data?: any) {
     // return Expression.calculate('${' + content + '}', fieldNames, data);
@@ -35,6 +36,19 @@ const user = {
 };
 
 function initExpression() {
+    const callbackFuncMap: Config = {
+        currentUser: () => user,
+        superiors: () => user.owner,
+        thousandFun: (num) => {
+            num = Math.round(num);
+            return (num + '').replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g, '$1,');
+        },
+    };
+    Expression.setConfig(callbackFuncMap);
+    initJexl();
+}
+
+function initSval(){
     const options = {
         ecmaVer: 6,
         sandBox: true,
@@ -66,20 +80,22 @@ function initExpression() {
     } as SvalOptions;
     const interpreter = new Sval(options);
     interpreter.import(Expression.funcMap);
-    const callbackFuncMap: Config = {
-        currentUser: () => user,
-        superiors: () => user.owner,
-        thousandFun: (num) => {
-            num = Math.round(num);
-            return (num + '').replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g, '$1,');
-        },
+    Expression.setConfig({
         eval: (expr, bizData, { null2Zero, otherVars }) => {
             interpreter.import({ bizData, ...otherVars });
             interpreter.run(`exports.result=${expr}`, { null2Zero, funcTypeMap: FuncTypeMap });
             return interpreter.exports.result;
         },
-    };
-    Expression.setConfig(callbackFuncMap);
+    });
+}
+
+function initJexl(){
+    jexl.addFunctions(Expression.funcMap);
+    Expression.setConfig({
+        eval: (expr, bizData, { null2Zero, otherVars }) => {
+            return jexl.evalSync(expr, { bizData, ...otherVars });
+        },
+    });
 }
 
 describe('多变量测试', () => {
