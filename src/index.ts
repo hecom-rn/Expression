@@ -29,7 +29,9 @@ interface User {
         code: string
         name: string
         metaName: string
+        toString?(): string
     }
+    owner?: User
 
     toString?(): string
 }
@@ -40,7 +42,6 @@ export interface Config {
     eval?: <T>(expr: string, bizData: object, config?: {
         null2Zero?: boolean, otherVars?: object,
     } & T) => any;
-    superiors?: () => User;
     thousandFun?: (num: number) => string;
 }
 
@@ -741,33 +742,7 @@ function TEXT(value) {
     return value.toString();
 }
 
-function CURRENT_USER() {
-    if (!defConfig.currentUser) return;
-    const user = defConfig.currentUser();
-    return {
-        code: user.code,
-        name: user.name,
-        metaName: user.metaName,
-        toString() {
-            return this.name;
-        }
-    };
-}
-
-function CURRENT_ORG() {
-    if (!defConfig.currentUser) return;
-    const { dept } = defConfig.currentUser();
-    return {
-        code: dept.code,
-        name: dept.name,
-        metaName: dept.metaName,
-        toString() {
-            return this.name;
-        }
-    };
-}
-
-export function _dateFromAny(obj: string | number | Date): Date {
+function _dateFromAny(obj: string | number | Date): Date {
     if (typeof obj === 'string') {
         const times = obj.split(/[ :/-]/, 6).map(item => Number(item)).filter(i => !isNaN(i));
         if (times.length === 0) {
@@ -1147,17 +1122,21 @@ function DATEVALUE(text: string | number | Date): string {
     }
 }
 
+function CURRENT_USER() {
+    if (!defConfig.currentUser) return;
+    return defConfig.currentUser();
+}
+
+function CURRENT_ORG() {
+    if (!defConfig.currentUser) return;
+    const { dept } = defConfig.currentUser();
+    return dept;
+}
+
 function CURRENT_OWNER(): User {
-    if (!defConfig.superiors) return;
-    const user = defConfig.superiors();
-    return {
-        code: user.code,
-        name: user.name,
-        metaName: user.metaName,
-        toString() {
-            return this.name;
-        }
-    };
+    if (!defConfig.currentUser) return;
+    const { owner } = defConfig.currentUser();
+    return owner;
 }
 
 export default {
