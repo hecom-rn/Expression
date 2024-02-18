@@ -742,7 +742,7 @@ function TEXT(value) {
     return value.toString();
 }
 
-function _dateFromAny(obj: string | number | Date): Date {
+export function _dateFromAny(obj: string | number | Date): Date {
     if (typeof obj === 'string') {
         const times = obj.split(/[ :/-]/, 6).map(item => Number(item)).filter(i => !isNaN(i));
         if (times.length === 0) {

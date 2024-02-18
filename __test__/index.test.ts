@@ -38,7 +38,6 @@ const user = {
 function initExpression() {
     const callbackFuncMap: Config = {
         currentUser: () => user,
-        superiors: () => user.owner,
         thousandFun: (num) => {
             num = Math.round(num);
             return (num + '').replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g, '$1,');
