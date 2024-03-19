@@ -495,7 +495,7 @@ function TIMEDIF(startTime, endTime, unit) {
 
 function DATEDIFV2(startTime, endTime, unit) {
     try {
-        if (startTime == null || startTime == null || unit == null) {
+        if (startTime == null || endTime == null || unit == null) {
             return null;
         }
         const startDate = moment(startTime).startOf('day');
