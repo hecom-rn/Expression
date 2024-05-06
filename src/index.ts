@@ -990,13 +990,13 @@ function FIND(targetText: string, text: string, startPoint: number): number {
 }
 
 /**
- * 判断field是否包含在options中，并且支持字符串部分匹配
+ * 判断field是否包含在options中，目前只用在单选场景中。
  * @param options
  * @param field
  * @constructor
  */
 function CONTAINS(options: string[], field: string): boolean {
-    return options.some((option) => field.includes(option));
+    return options.some((option) => option == field);
 }
 
 /**
