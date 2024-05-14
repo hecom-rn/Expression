@@ -47,7 +47,7 @@ function initExpression() {
     initSval();
 }
 
-function initSval(){
+function initSval() {
     const options = {
         ecmaVer: 6,
         sandBox: true,
@@ -88,7 +88,7 @@ function initSval(){
     });
 }
 
-function initJexl(){
+function initJexl() {
     jexl.addFunctions(Expression.funcMap);
     Expression.setConfig({
         eval: (expr, bizData, { null2Zero, otherVars }) => {
@@ -119,9 +119,12 @@ describe('formula', () => {
     beforeAll(initExpression);
     test('CONTAINS', () => {
         const options = `['option1', 'option3']`;
-        const field = 'option2/option1'
-        const result = expression(`CONTAINS(${options}, '${field}')`)
+        const field = 'option1'
+        let result = expression(`CONTAINS(${options}, '${field}')`)
         expect(result).toBeTruthy()
+        const field2 = 'option2'
+        result = expression(`CONTAINS(${options}, '${field2}')`)
+        expect(result).toBeFalsy()
     });
     test('ABS', () => {
         const f = function (count) {
