@@ -36,9 +36,24 @@ interface User {
     toString?(): string
 }
 
+interface Dept {
+    code: string
+    name: string
+    metaName: string
+    dept?: {
+        code: string
+        name: string
+        metaName: string
+        toString?(): string
+    }
+    owner?: User
+
+    toString?(): string
+}
 
 export interface Config {
     currentUser?: () => User;
+    nearOrg?: () => Dept;
     eval?: <T>(expr: string, bizData: object, config?: {
         null2Zero?: boolean, otherVars?: object,
     } & T) => any;
@@ -286,7 +301,7 @@ const _DefaultExpressionFuncs = {
     AND, OR, IF, FirstNotNull, TRUE, FALSE, CASE, NULL, ISNOTNULL, ISNULL, isNULL, isNotNULL, CONTAINS, INVERT,
     // 文本函数
     LEFT, RIGHT, SEARCH, CONCATENATE, TEXT, TOCAPITAL, TO_CAPITAL_RMB, FIND, SLICE, ID_TO_AGE, TONUMBER,
-    CURRENT_USER, CURRENT_ORG, CURRENT_OWNER
+    CURRENT_USER, CURRENT_ORG, CURRENT_OWNER, NEAR_ORG
 };
 
 export const FuncTypeMap: FunctionTypeMap = {
@@ -1120,6 +1135,11 @@ function DATEVALUE(text: string | number | Date): string {
     } catch (e) {
         return null;
     }
+}
+
+function NEAR_ORG() {
+    if (!defConfig.nearOrg) return;
+    return defConfig.nearOrg();
 }
 
 function CURRENT_USER() {
