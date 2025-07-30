@@ -1,5 +1,5 @@
 import Decimal from "decimal.js";
-import moment from "moment";
+import { TimeUtils, TimeInstance } from '@hecom/aDate';
 
 export type AnalyzeResult = string[];
 
@@ -509,7 +509,7 @@ function TIMEDIF(startTime, endTime, unit) {
         if (start == null || end == null) {
             return null;
         }
-        const diff = Number(start.getTime()) - Number(end.getTime());
+        const diff = Number(start.valueOf()) - Number(end.valueOf());
         if (!isNaN(diff)) {
             const func = diff >= 0 ? Math.floor : Math.ceil;
             if (unit === 'h' || unit === 'H') {
@@ -531,8 +531,8 @@ function DATEDIFV2(startTime, endTime, unit) {
         if (startTime == null || endTime == null || unit == null) {
             return null;
         }
-        const startDate = moment(startTime).startOf('day');
-        const endDate = moment(endTime).startOf('day');
+        const startDate = TimeUtils.create(startTime).startOfDay();
+        const endDate = TimeUtils.create(endTime).startOfDay();
         if (!startDate.isValid() || !endDate.isValid()) {
             return null;
         }
@@ -558,35 +558,26 @@ function DATEDIF(startDateTimestamp, endDateTimestamp, unit) {
         }
         const startDate = _dateFromAny(startDateTimestamp);
         const endDate = _dateFromAny(endDateTimestamp);
-        if (startDate == null || endDate == null) {
+        if (!startDate?.isValid() || !endDate?.isValid()) {
             return null;
         }
-        const setDayIgnoreHour = function (time) {
-            time.setHours(0);
-            time.setMinutes(0);
-            time.setSeconds(0);
-            time.setMilliseconds(0);
-        };
+
         if (unit === 'Y' || unit === 'y') {
-            return endDate.getFullYear() - startDate.getFullYear();
+            return endDate.getYear() - startDate.getYear();
         } else if (unit === 'M') {
-            return endDate.getMonth() - startDate.getMonth() + (endDate.getFullYear() - startDate.getFullYear()) * 12;
+            return endDate.getMonth() - startDate.getMonth() + (endDate.getYear() - startDate.getYear()) * 12;
         } else if (unit === 'D' || unit === 'd') {
-            setDayIgnoreHour(startDate);
-            setDayIgnoreHour(endDate);
-            return (endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000);
+            const startDayStart = startDate.startOfDay();
+            const endDayStart = endDate.startOfDay();
+            return (endDayStart.valueOf() - startDayStart.valueOf()) / (24 * 60 * 60 * 1000);
         } else if (unit === 'MD') {
             return endDate.getDate() - startDate.getDate();
         } else if (unit === 'YM') {
             return endDate.getMonth() - startDate.getMonth();
         } else if (unit === 'YD') {
-            const setIgnoreYearUseDay = function (time) {
-                time.setFullYear(1970);
-                setDayIgnoreHour(time);
-            };
-            setIgnoreYearUseDay(startDate);
-            setIgnoreYearUseDay(endDate);
-            return (endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000);
+            const start1970 = startDate.year(1970).startOfDay();
+            const end1970 = endDate.year(1970).startOfDay();
+            return (end1970.valueOf() - start1970.valueOf()) / (24 * 60 * 60 * 1000);
         } else {
             return null;
         }
@@ -597,15 +588,11 @@ function DATEDIF(startDateTimestamp, endDateTimestamp, unit) {
 }
 
 function TODAY() {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return today.getTime();
+    return TimeUtils.create().startOfDay().valueOf();
 }
 
 function NOW() {
-    const now = new Date();
-    now.setMilliseconds(0);
-    return now.getTime();
+    return TimeUtils.create().millisecond(0).valueOf();
 }
 
 function TIMEOFFSET(startTimestamp, unit, value) {
@@ -613,16 +600,16 @@ function TIMEOFFSET(startTimestamp, unit, value) {
         if (typeof value !== 'number' || !unit || startTimestamp === undefined || startTimestamp === null) {
             return null;
         }
-        const date = _dateFromAny(startTimestamp);
-        if (date == null) {
+        const timeObj = _dateFromAny(startTimestamp);
+        if (!timeObj?.isValid()) {
             return null
         }
         if (unit === 'H' || unit === 'h') {
-            return date.getTime() + value * 60 * 60 * 1000;
+            return timeObj.add(value, 'hour').valueOf();
         } else if (unit === 'M' || unit === 'm') {
-            return date.getTime() + value * 60 * 1000;
+            return timeObj.add(value, 'minute').valueOf();
         } else if (unit === 'S' || unit === 's') {
-            return date.getTime() + value * 1000;
+            return timeObj.add(value, 'second').valueOf();
         } else {
             return null;
         }
@@ -636,7 +623,7 @@ function DATEOFFSET(startDateTimestamp, unit, value) {
         if (typeof value !== 'number' || !unit || startDateTimestamp === undefined || startDateTimestamp === null) {
             return null;
         }
-        const date = moment(startDateTimestamp);
+        const date = TimeUtils.create(startDateTimestamp);
         if (!date.isValid()) {
             return null
         }
@@ -644,19 +631,19 @@ function DATEOFFSET(startDateTimestamp, unit, value) {
         switch (unit) {
             case 'Y':
             case 'y':
-                diffUnit = 'y';
+                diffUnit = 'year';
                 break;
             case 'M':
             case 'm':
-                diffUnit = 'M';
+                diffUnit = 'month';
                 break;
             case 'D':
             case 'd':
-                diffUnit = 'd';
+                diffUnit = 'day';
                 break;
             case 'H':
             case 'h':
-                diffUnit = 'h';
+                diffUnit = 'hour';
                 break;
         }
         if (diffUnit == null) {
@@ -757,15 +744,16 @@ function TEXT(value) {
     return value.toString();
 }
 
-export function _dateFromAny(obj: string | number | Date): Date {
+export function _dateFromAny(obj: string | number | TimeInstance): TimeInstance {
     if (typeof obj === 'string') {
         const times = obj.split(/[ :/-]/, 6).map(item => Number(item)).filter(i => !isNaN(i));
         if (times.length === 0) {
             return null;
         }
-        return new Date(times[0], times[1] - 1 || 0, times[2] || 1, times[3] || 0, times[4] || 0, times[5] || 0);
+        return TimeUtils.create().year(times[0]).month((times[1] || 1) - 1).date(times[2] || 1)
+            .hour(times[3] || 0).minute(times[4] || 0).second(times[5] || 0);
     } else if (typeof obj === 'number') {
-        return new Date(obj);
+        return TimeUtils.create(obj);
     } else {
         return obj;
     }
@@ -819,8 +807,11 @@ function DAY(date) {
     if (date === undefined || date === '' || date === null) {
         return null;
     }
-    const time = _dateFromAny(date);
-    const day = time ? time.getDate() : null;
+    const timeObj = _dateFromAny(date);
+    if (!timeObj?.isValid()) {
+        return null;
+    }
+    const day = timeObj.getDate();
     return day > 0 ? day : null;
 }
 
@@ -828,17 +819,23 @@ function MONTH(date) {
     if (date === undefined || date === '' || date === null) {
         return null;
     }
-    const time = _dateFromAny(date);
-    const month = time ? time.getMonth() + 1 : null;
+    const timeObj = _dateFromAny(date);
+    if (!timeObj?.isValid()) {
+        return null;
+    }
+    const month = timeObj.getMonth() + 1;
     return month > 0 ? month : null;
 }
 
-function YEAR(date: string | number | Date): number | undefined {
+function YEAR(date: string | number | TimeInstance): number | undefined {
     if (date === undefined || date === '' || date === null) {
         return null;
     }
     const time = _dateFromAny(date);
-    const year = time ? time.getFullYear() : null;
+    if (!time?.isValid()) {
+        return null;
+    }
+    const year = time.getYear();
     return year > 0 ? year : null;
 }
 
@@ -867,9 +864,7 @@ function TODATE(year, month, day) {
         }
     }
     try {
-        const date = new Date(Number(year), Number(month) - 1, Number(day));
-        const timestamp = date.getTime();
-        return timestamp;
+        return TimeUtils.create().year(Number(year)).month(Number(month) - 1).date(Number(day)).startOfDay().valueOf();
     } catch (e) {
         return null
     }
@@ -1071,11 +1066,11 @@ function ID_TO_AGE(idCard: string): number | null {
     if (isNaN(month) || isNaN(day) || month > 12 || month === 0 || day > 31 || day === 0) {
         return null;
     }
-    const date = new Date();
-    const currentTimestamp = date.getTime();
-    const currentYear = date.getFullYear();
+    const currentTime = TimeUtils.create();
+    const currentTimestamp = currentTime.valueOf();
+    const currentYear = currentTime.getYear();
     const birthDay = currentYear + '-' + `${month}-${day}`;
-    const birthdayTimestamp = new Date(birthDay).getTime();
+    const birthdayTimestamp = TimeUtils.create(birthDay).valueOf();
     let old = 0;
     if (currentYear - year > 0) {
         birthdayTimestamp < currentTimestamp ? old = currentYear - year :
@@ -1110,27 +1105,26 @@ function WEEKDAY(date: number, return_type: 1 | 2 | 3 = 1): number {
     }
 }
 
-function TOTIMESTAMP(date: number | string | Date): number {
+function TOTIMESTAMP(date: number | string | TimeInstance): number {
     const result = _dateFromAny(date);
     if (result == null) {
         return null;
     }
-    return result.getTime();
+    return result.valueOf();
 }
 
-function DATEVALUE(text: string | number | Date): string {
+function DATEVALUE(text: string | number | TimeInstance): string {
     if (text === undefined || text === '' || text === null) {
         return null;
     }
     const result = _dateFromAny(text);
-    if (!result || isNaN(result.getTime())) {
+    if (!result || isNaN(result?.valueOf())) {
         return null;
     }
     try {
-        const time = new Date(result.getTime());
-        const year = time.getFullYear();
-        const month = time.getMonth() + 1;
-        const day = time.getDate();
+        const year = result.getYear();
+        const month = result.getMonth() + 1;
+        const day = result.getDate();
         return year + '年' + month + '月' + day + '日';
     } catch (e) {
         return null;

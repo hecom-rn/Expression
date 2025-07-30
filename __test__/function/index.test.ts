@@ -1,6 +1,7 @@
 import Expression, {_dateFromAny} from '../../src/index';
 import testCaseList from './函数公式.json';
-import {advanceTo} from 'jest-date-mock';
+import {advanceTo, clear} from 'jest-date-mock';
+import { TimeUtils } from '@hecom/aDate';
 
 const funcMap = Object.keys(Expression.funcMap).reduce((pre, cur) => {
     pre[cur] = (...args) => {
@@ -27,14 +28,12 @@ describe('时间函数测试', () => {
         expect(funcMap.TIMEDIF(start, end, type)).toEqual(result === null ? result : Number(result))
     })
     it.each(allTestCase.filter(item => item.code.includes('TODAY')))('TODAY', () => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        expect(funcMap.TODAY()).toEqual(today.getTime())
+        const today = TimeUtils.create().startOfDay();
+        expect(funcMap.TODAY()).toEqual(today.valueOf())
     })
     it.each(allTestCase.filter(item => item.code.includes('NOW')))('NOW', () => {
-        const now = new Date();
-        now.setMilliseconds(0);
-        expect(funcMap.NOW()).toEqual(now.getTime())
+        const now = TimeUtils.create().millisecond(0);
+        expect(funcMap.NOW()).toEqual(now.valueOf())
     })
     it.each(allTestCase.filter(item => item.code.includes('DATEOFFSET')))('DATEOFFSET-%s', ({
                                                                                                 ['返回值']: result,
@@ -43,7 +42,7 @@ describe('时间函数测试', () => {
                                                                                                 ['参数3']: value,
                                                                                             }: any) => {
         const date = funcMap.DATEOFFSET(start, unit, value == null || isNaN(value) ? value : Number(value))
-        expect(date).toEqual(result === null ? result : _dateFromAny(result)?.getTime())
+        expect(date).toEqual(result === null ? result : _dateFromAny(result)?.valueOf())
     })
     it.each(allTestCase.filter(item => item.code.includes('TIMEOFFSET')))('TIMEOFFSET-%s', ({
                                                                                                 ['返回值']: result,
@@ -52,7 +51,7 @@ describe('时间函数测试', () => {
                                                                                                 ['参数3']: value,
                                                                                             }: any) => {
         const date = funcMap.TIMEOFFSET(start, unit, value == null || isNaN(value) ? value : Number(value))
-        expect(date).toEqual(result === null ? result : _dateFromAny(result)?.getTime())
+        expect(date).toEqual(result === null ? result : _dateFromAny(result)?.valueOf())
     })
     it.each(allTestCase.filter(item => item.code.startsWith('DAY')))('DAY-%s', ({
                                                                                   ['返回值']: result,
@@ -80,7 +79,7 @@ describe('时间函数测试', () => {
                                                                                     }: any) => {
         const date = funcMap.TODATE(year, month, day);
         expect(date).toEqual(
-            result === null || result == '' || result == undefined ? result : _dateFromAny(result).getTime())
+            result === null || result == '' || result == undefined ? result : _dateFromAny(result).valueOf())
     })
     it.each(allTestCase.filter(item => item.code.includes('DATEVALUE')))('DATEVALUE-%s', ({
                                                                                               ['返回值']: result,
@@ -94,7 +93,7 @@ describe('时间函数测试', () => {
                                                                                           ['参数2']: type,
                                                                                       }: any) => {
         const date = _dateFromAny(value);
-        expect(funcMap.WEEKDAY((date == null ? value : date.getTime()) as number,
+        expect(funcMap.WEEKDAY((date == null ? value : date.valueOf()) as number,
             (type == null || type == undefined || isNaN(Number(type)) ? type : Number(type)) as 1 | 2 | 3))
             .toEqual(result === null ? null : Number(result))
     })

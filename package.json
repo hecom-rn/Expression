@@ -45,6 +45,6 @@
   },
   "dependencies": {
     "decimal.js": "^10.4.3",
-    "moment": "^2.29.4"
+    "@hecom/aDate": "https://github.com/hecom-rn/aDate.git#dd30247e814b98096f7d42dc50ec3314a43cda3d"
   }
 }
