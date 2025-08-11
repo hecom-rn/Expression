@@ -864,7 +864,7 @@ function TODATE(year, month, day) {
         }
     }
     try {
-        return TimeUtils.create().year(Number(year)).month(Number(month) - 1).date(Number(day)).startOfDay().valueOf();
+        return TimeUtils.create().year(Number(year)).month(Number(month) - 1).date(Number(day)).startOfDay().valueOf(true);
     } catch (e) {
         return null
     }
@@ -1066,7 +1066,8 @@ function ID_TO_AGE(idCard: string): number | null {
     if (isNaN(month) || isNaN(day) || month > 12 || month === 0 || day > 31 || day === 0) {
         return null;
     }
-    const currentTime = TimeUtils.create();
+    // 从身份证号解析出来的年、月、日是北京时间，计算年龄时只需要将当前时间的时区和上面的时区对齐即可，即将当前时间的时区转换到北京时区
+    const currentTime = TimeUtils.create().tz('Asia/Shanghai');
     const currentTimestamp = currentTime.valueOf();
     const currentYear = currentTime.getYear();
     const birthDay = currentYear + '-' + `${month}-${day}`;
