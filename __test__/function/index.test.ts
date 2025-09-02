@@ -79,7 +79,7 @@ describe('时间函数测试', () => {
                                                                                     }: any) => {
         const date = funcMap.TODATE(year, month, day);
         expect(date).toEqual(
-            result === null || result == '' || result == undefined ? result : _dateFromAny(result).valueOf())
+            result === null || result == '' || result == undefined ? result : _dateFromAny(result).valueOf(true))
     })
     it.each(allTestCase.filter(item => item.code.includes('DATEVALUE')))('DATEVALUE-%s', ({
                                                                                               ['返回值']: result,

@@ -324,8 +324,8 @@ describe('formula', () => {
 
     test('TODATE', () => {
         const dateArr = [
-            { key: [2019, 12, 1], value: TimeUtils.create('2019-12-1').valueOf() },
-            { key: [1990, 1, 1], value: TimeUtils.create('1990-1-1').valueOf() },
+            { key: [2019, 12, 1], value: TimeUtils.create('2019-12-1').valueOf(true) },
+            { key: [1990, 1, 1], value: TimeUtils.create('1990-1-1').valueOf(true) },
             { key: ['"异常测试"', '"嘻嘻"', '"哈哈"'], value: null },
             { key: [undefined, 9, 27], value: null },
             { key: [9012, '""', 27], value: null },
