@@ -1,7 +1,7 @@
 import Expression, {_dateFromAny} from '../../src/index';
 import testCaseList from './函数公式.json';
 import {advanceTo, clear} from 'jest-date-mock';
-import { TimeUtils } from '@hecom/aDate';
+import {setSystemTimezone, setDefaultTimezone, TimeUtils} from '@hecom/aDate';
 
 const funcMap = Object.keys(Expression.funcMap).reduce((pre, cur) => {
     pre[cur] = (...args) => {
@@ -11,6 +11,10 @@ const funcMap = Object.keys(Expression.funcMap).reduce((pre, cur) => {
 }, {} as typeof Expression.funcMap);
 const allTestCase = testCaseList.map(testCase => Object.assign(testCase, {toString: () => testCase.code.substring(-3)}))
 describe('时间函数测试', () => {
+    beforeAll(() => {
+        setSystemTimezone('Asia/Tokyo');
+        setDefaultTimezone('Asia/Shanghai');
+    });
     it.each(allTestCase.filter(item => item.code.startsWith('DATEDIF')))('DATEDIF-%s', ({
                                                                                             ['返回值']: result,
                                                                                             ['参数1']: start,

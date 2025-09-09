@@ -811,7 +811,7 @@ function DAY(date) {
     if (!timeObj?.isValid()) {
         return null;
     }
-    const day = timeObj.getDate();
+    const day = timeObj.getDate(true);
     return day > 0 ? day : null;
 }
 
@@ -823,7 +823,7 @@ function MONTH(date) {
     if (!timeObj?.isValid()) {
         return null;
     }
-    const month = timeObj.getMonth() + 1;
+    const month = timeObj.getMonth(true) + 1;
     return month > 0 ? month : null;
 }
 
@@ -835,7 +835,7 @@ function YEAR(date: string | number | TimeInstance): number | undefined {
     if (!time?.isValid()) {
         return null;
     }
-    const year = time.getYear();
+    const year = time.getYear(true);
     return year > 0 ? year : null;
 }
 
@@ -1094,7 +1094,7 @@ function WEEKDAY(date: number, return_type: 1 | 2 | 3 = 1): number {
     if (result == null) {
         return null;
     }
-    const weekDay = result.getDay();
+    const weekDay = result.getDay(true);
     if (return_type === 1) {
         return weekDay + 1
     } else if (return_type === 2) {
@@ -1123,9 +1123,9 @@ function DATEVALUE(text: string | number | TimeInstance): string {
         return null;
     }
     try {
-        const year = result.getYear();
-        const month = result.getMonth() + 1;
-        const day = result.getDate();
+        const year = result.getYear(true);
+        const month = result.getMonth(true) + 1;
+        const day = result.getDate(true);
         return year + '年' + month + '月' + day + '日';
     } catch (e) {
         return null;
