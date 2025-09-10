@@ -2,7 +2,6 @@ const csvFilePath = './__test__/function/函数公式.csv'
 const jsonFilePath = './__test__/function/函数公式.json'
 const csv = require('csvtojson');
 const fs = require('fs')
-const {TimeUtils} = require('@hecom/aDate');
 
 const all = []
 const convert = (value) => {
@@ -15,7 +14,7 @@ const convert = (value) => {
     } else if (value === 'TRUE' || value === 'true') {
         return true;
     } else if (value.startsWith('日期：') || value.startsWith('时间：')) {
-        return TimeUtils.create(value.replace('日期：', '').replace('时间：', '')).getTime();
+        return new Date(value.replace('日期：', '').replace('时间：', '')).getTime();
     } else if (value.startsWith('文本：')) {
         return value.replace('文本：', '')
     } else if (value.startsWith('数值：')) {
