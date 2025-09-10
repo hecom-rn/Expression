@@ -2,6 +2,7 @@ import Expression, {_dateFromAny} from '../../src/index';
 import testCaseList from './函数公式.json';
 import {advanceTo, clear} from 'jest-date-mock';
 import {setSystemTimezone, setDefaultTimezone, TimeUtils} from '@hecom/aDate';
+import {beforeEach} from 'jest-circus';
 
 const funcMap = Object.keys(Expression.funcMap).reduce((pre, cur) => {
     pre[cur] = (...args) => {
@@ -9,11 +10,18 @@ const funcMap = Object.keys(Expression.funcMap).reduce((pre, cur) => {
     }
     return pre;
 }, {} as typeof Expression.funcMap);
+
+const setTimeZone = (defaultTimezone: string, systemTimezone: string) => {
+    // 默认设置个人时区为上海，租户时区为首尔，如果需要测试其他时区，单测内自行设置
+    setDefaultTimezone(defaultTimezone);
+    setSystemTimezone(systemTimezone);
+};
+
 const allTestCase = testCaseList.map(testCase => Object.assign(testCase, {toString: () => testCase.code.substring(-3)}))
 describe('时间函数测试', () => {
-    beforeAll(() => {
-        setSystemTimezone('Asia/Tokyo');
-        setDefaultTimezone('Asia/Shanghai');
+    beforeEach(() => {
+        // 默认设置个人时区为上海，租户时区为首尔，如果需要测试其他时区，单测内自行设置
+        setTimeZone('Asia/Shanghai','Asia/Seoul');
     });
     it.each(allTestCase.filter(item => item.code.startsWith('DATEDIF')))('DATEDIF-%s', ({
                                                                                             ['返回值']: result,
@@ -58,15 +66,21 @@ describe('时间函数测试', () => {
         expect(date).toEqual(result === null ? result : _dateFromAny(result)?.valueOf())
     })
     it.each(allTestCase.filter(item => item.code.startsWith('DAY')))('DAY-%s', ({
-                                                                                  ['返回值']: result,
-                                                                                  ['参数1']: date,
+                                                                                    ['返回值']: result,
+                                                                                    ['参数1']: date,
+                                                                                    ['个人时区']: defaultZone,
+                                                                                    ['租户时区']: systemZone,
                                                                               }) => {
+        (defaultZone || systemZone) && setTimeZone(defaultZone, systemZone);
         expect(funcMap.DAY(date)).toEqual(result == null ? result : Number(result));
     })
     it.each(allTestCase.filter(item => item.code.includes('MONTH')))('MONTH-%s', ({
                                                                                       ['返回值']: result,
                                                                                       ['参数1']: date,
+                                                                                      ['个人时区']: defaultZone,
+                                                                                      ['租户时区']: systemZone,
                                                                                   }) => {
+        (defaultZone || systemZone) && setTimeZone(defaultZone, systemZone);
         expect(funcMap.MONTH(date)).toEqual(result == null ? result : Number(result))
     })
     it.each(allTestCase.filter(item => item.code.includes('YEAR')))('YEAR-%s', ({
@@ -88,7 +102,11 @@ describe('时间函数测试', () => {
     it.each(allTestCase.filter(item => item.code.includes('DATEVALUE')))('DATEVALUE-%s', ({
                                                                                               ['返回值']: result,
                                                                                               ['参数1']: date,
+                                                                                              ['个人时区']: defaultZone,
+                                                                                              ['租户时区']: systemZone,
                                                                                           }: any) => {
+
+        (defaultZone || systemZone) && setTimeZone(defaultZone, systemZone);
         expect(funcMap.DATEVALUE(date)).toEqual(result);
     })
     it.each(allTestCase.filter(item => item.code.includes('WEEKDAY')))('WEEKDAY-%s', ({
