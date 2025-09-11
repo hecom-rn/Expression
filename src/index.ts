@@ -1,5 +1,6 @@
 import Decimal from "decimal.js";
 import { TimeUtils, TimeInstance } from '@hecom/aDate';
+import { zoneConfig } from '@hecom/aDate/config';
 
 export type AnalyzeResult = string[];
 
@@ -531,8 +532,8 @@ function DATEDIFV2(startTime, endTime, unit) {
         if (startTime == null || endTime == null || unit == null) {
             return null;
         }
-        const startDate = TimeUtils.create(startTime).startOfDay();
-        const endDate = TimeUtils.create(endTime).startOfDay();
+        const startDate = TimeUtils.create(startTime).tz(zoneConfig.systemZone).startOfDay();
+        const endDate = TimeUtils.create(endTime).tz(zoneConfig.systemZone).startOfDay();
         if (!startDate.isValid() || !endDate.isValid()) {
             return null;
         }

@@ -113,7 +113,10 @@ describe('时间函数测试', () => {
                                                                                           ['返回值']: result,
                                                                                           ['参数1']: value,
                                                                                           ['参数2']: type,
+                                                                                          ['个人时区']: defaultZone,
+                                                                                          ['租户时区']: systemZone,
                                                                                       }: any) => {
+        (defaultZone || systemZone) && setTimeZone(defaultZone, systemZone);
         const date = _dateFromAny(value);
         expect(funcMap.WEEKDAY((date == null ? value : date.valueOf()) as number,
             (type == null || type == undefined || isNaN(Number(type)) ? type : Number(type)) as 1 | 2 | 3))
