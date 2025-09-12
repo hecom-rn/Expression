@@ -1,7 +1,8 @@
+import csv from 'csvtojson/index';
+import * as fs from 'node:fs';
+import { TimeUtils } from '@hecom/aDate';
 const csvFilePath = './__test__/function/函数公式.csv'
 const jsonFilePath = './__test__/function/函数公式.json'
-const csv = require('csvtojson');
-const fs = require('fs')
 
 const all = []
 const convert = (value) => {
@@ -14,7 +15,7 @@ const convert = (value) => {
     } else if (value === 'TRUE' || value === 'true') {
         return true;
     } else if (value.startsWith('日期：') || value.startsWith('时间：')) {
-        return new Date(value.replace('日期：', '').replace('时间：', '')).getTime();
+        return TimeUtils.create(value.replace('日期：', '').replace('时间：', '')).valueOf();
     } else if (value.startsWith('文本：')) {
         return value.replace('文本：', '')
     } else if (value.startsWith('数值：')) {
@@ -29,7 +30,7 @@ csv({trim: false})
     .then((data) => {
         data.forEach(json => {
             if (json['编号'] && json['不适用（0：不适用前端，1：不适用后端）'] !== '0') {
-                all.push(Object.keys(json).reduce((pre, cur) => {
+                all.push(Object.keys(json).reduce((pre: any, cur) => {
                     if (cur === '编号') {
                         pre.code = json[cur]
                     } else if (keys.includes(cur)) {
