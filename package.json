@@ -4,7 +4,6 @@
   "private": false,
   "description": "Calculate Expression",
   "main": "src/index.ts",
-  "type": "module",
   "scripts": {
     "test": "npx tsx __test__/function/csv2json.ts;jest",
     "lint": "./node_modules/.bin/eslint . --ext .ts,.tsx;",
