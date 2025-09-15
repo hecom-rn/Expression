@@ -3,6 +3,7 @@ import { advanceTo, clear } from 'jest-date-mock';
 import Sval, { SvalOptions } from "sval";
 import jexl from 'jexl';
 import { TimeUtils } from '@hecom/aDate';
+import { setTimeZone } from './function/index.test';
 
 function expression(content: string, data?: any) {
     // return Expression.calculate('${' + content + '}', fieldNames, data);
@@ -117,7 +118,10 @@ describe('多变量测试', () => {
  * 函数相关的表达式测试用例
  */
 describe('formula', () => {
-    beforeAll(initExpression);
+    beforeAll(() => {
+        setTimeZone('Asia/Shanghai','Asia/Shanghai');
+        initExpression();
+    });
     test('CONTAINS', () => {
         const options = `['option1', 'option3']`;
         const field = 'option1'

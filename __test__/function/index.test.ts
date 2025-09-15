@@ -11,7 +11,7 @@ const funcMap = Object.keys(Expression.funcMap).reduce((pre, cur) => {
     return pre;
 }, {} as typeof Expression.funcMap);
 
-const setTimeZone = (defaultTimezone: string = 'Asia/Shanghai', systemTimezone: string = 'Asia/Shanghai') => {
+export const setTimeZone = (defaultTimezone: string = 'Asia/Shanghai', systemTimezone: string = 'Asia/Shanghai') => {
     // 默认设置个人时区为上海，租户时区为首尔，如果需要测试其他时区，单测内自行设置
     setDefaultTimezone(defaultTimezone);
     setSystemTimezone(systemTimezone);
