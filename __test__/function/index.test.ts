@@ -100,10 +100,14 @@ describe('时间函数测试', () => {
                                                                                         ['参数1']: year,
                                                                                         ['参数2']: month,
                                                                                         ['参数3']: day,
+                                                                                        ['个人时区']: defaultZone,
+                                                                                        ['租户时区']: systemZone,
                                                                                     }: any) => {
+
+        setTimeZone(defaultZone, systemZone);
         const date = funcMap.TODATE(year, month, day);
         expect(date).toEqual(
-            result === null || result == '' || result == undefined ? result : _dateFromAny(result).valueOf(true))
+            result === null || result == '' || result == undefined ? result : _dateFromAny(result).valueOf())
     })
     it.each(allTestCase.filter(item => item.code.includes('DATEVALUE')))('DATEVALUE-%s', ({
                                                                                               ['返回值']: result,

@@ -865,7 +865,8 @@ function TODATE(year, month, day) {
         }
     }
     try {
-        return TimeUtils.create().year(Number(year)).month(Number(month) - 1).date(Number(day)).startOfDay().valueOf(true);
+        const date = TimeUtils.create(`${year}-${month}-${day} 00:00:00`, undefined, zoneConfig.timezone);
+        return date.valueOf();
     } catch (e) {
         return null
     }
