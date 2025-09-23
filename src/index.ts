@@ -589,11 +589,11 @@ function DATEDIF(startDateTimestamp, endDateTimestamp, unit) {
 }
 
 function TODAY() {
-    return TimeUtils.create().startOfDay().valueOf();
+    return TimeUtils.now().startOfDay().valueOf();
 }
 
 function NOW() {
-    return TimeUtils.create().millisecond(0).valueOf();
+    return TimeUtils.now().millisecond(0).valueOf();
 }
 
 function TIMEOFFSET(startTimestamp, unit, value) {
