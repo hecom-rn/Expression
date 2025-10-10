@@ -2,6 +2,8 @@ import Expression, { Config, FuncTypeMap } from '../src/index';
 import { advanceTo, clear } from 'jest-date-mock';
 import Sval, { SvalOptions } from "sval";
 import jexl from 'jexl';
+import { TimeUtils } from '@hecom/aDate';
+import { setTimeZone } from './function/index.test';
 
 function expression(content: string, data?: any) {
     // return Expression.calculate('${' + content + '}', fieldNames, data);
@@ -116,7 +118,10 @@ describe('多变量测试', () => {
  * 函数相关的表达式测试用例
  */
 describe('formula', () => {
-    beforeAll(initExpression);
+    beforeAll(() => {
+        setTimeZone('Asia/Shanghai','Asia/Shanghai');
+        initExpression();
+    });
     test('CONTAINS', () => {
         const options = `['option1', 'option3']`;
         const field = 'option1'
@@ -215,7 +220,7 @@ describe('formula', () => {
 
     test('TIMEDIF', () => {
         const dif = 4832894;
-        const start = Date.now();
+        const start = TimeUtils.create().valueOf();
         let end = start + dif;
         const units = ['h', 'm', 's'];
         units.forEach(unit => {
@@ -323,8 +328,8 @@ describe('formula', () => {
 
     test('TODATE', () => {
         const dateArr = [
-            { key: [2019, 12, 1], value: new Date('2019-12-1').getTime() },
-            { key: [1990, 1, 1], value: new Date('1990-1-1').getTime() },
+            { key: [2019, 12, 1], value: TimeUtils.create('2019-12-1').valueOf(true) },
+            { key: [1990, 1, 1], value: TimeUtils.create('1990-1-1').valueOf(true) },
             { key: ['"异常测试"', '"嘻嘻"', '"哈哈"'], value: null },
             { key: [undefined, 9, 27], value: null },
             { key: [9012, '""', 27], value: null },
@@ -337,7 +342,7 @@ describe('formula', () => {
     });
 
     it('DATEOFFSET', () => {
-        const date = new Date('2022-01-06').getTime();
+        const date = TimeUtils.create('2022-01-06').valueOf();
         const testData = [
             { date, unit: 'Y', value: -3, result: '2019-01-06' },
             { date, unit: 'y', value: 3, result: '2025-01-06' },
@@ -345,7 +350,7 @@ describe('formula', () => {
             { date, unit: 'm', value: 3, result: '2022-04-06' },
             { date, unit: 'D', value: -13, result: '2021-12-24' },
             { date, unit: 'd', value: 13, result: '2022-01-19' },
-            { date, unit: 'H', value: -11, result: '2022-01-05 21:00:00' },
+            { date, unit: 'H', value: -11, result: '2022-01-05 13:00:00' },
             { date: undefined, unit: 'h', value: 3, result: null },
             { date: undefined, unit: 'h', value: '3', result: null },
             { date, unit: 'y', value: '3', result: '2025-01-06' },
@@ -359,13 +364,13 @@ describe('formula', () => {
             if (result === undefined) {
                 expect(result).toBe(item.result);
             } else {
-                expect(result).toBe(item.result ? new Date(item.result).getTime() : item.result);
+                expect(result).toBe(item.result ? TimeUtils.create(item.result).valueOf() : item.result);
             }
 
         });
 
         // 补充月份边界
-        const date1 = new Date('2022-03-31').getTime();
+        const date1 = TimeUtils.create('2022-03-31').valueOf();
         const testData1 = [
             { date: date1, unit: 'M', value: -2, result: '2022-01-31' },
             { date: date1, unit: 'M', value: 1, result: '2022-04-30' },
@@ -375,12 +380,12 @@ describe('formula', () => {
         ]
         testData1.forEach(item => {
             const result = expression(`DATEOFFSET(${item.date},'${item.unit}',${item.value})`);
-            expect(result).toBe(item.result ? new Date(item.result).getTime() : item.result);
+            expect(result).toBe(item.result ? TimeUtils.create(item.result).valueOf() : item.result);
         });
     })
 
     it('TIMEOFFSET', () => {
-        const date = new Date('2022-01-06 08:00:00').getTime();
+        const date = TimeUtils.create('2022-01-06 08:00:00').valueOf();
         const testData = [
             { date, unit: 'H', value: -11, result: '2022-01-05 21:00:00' },
             { date, unit: 'h', value: 3, result: '2022-01-06 11:00:00' },
@@ -404,7 +409,7 @@ describe('formula', () => {
                 expect(result).toBe(item.result);
             } else {
                 console.log(item.value, item.result,)
-                expect(result).toBe(item.result ? new Date(item.result).getTime() : item.result);
+                expect(result).toBe(item.result ? TimeUtils.create(item.result).valueOf() : item.result);
             }
         });
     })
@@ -593,7 +598,7 @@ describe('formula', () => {
     });
 
     test('ID_TO_AGE', () => {
-        advanceTo(new Date('2020-02-20T02:03:30.331Z'));
+        advanceTo(TimeUtils.create('2020-02-20T02:03:30.331Z').valueOf());
         const arr = [
             { key: 422324199610271952, value: 23 },
             { key: 110102199209081234, value: 27 },
