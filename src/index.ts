@@ -1,5 +1,6 @@
 import Decimal from "decimal.js";
 import { TimeUtils, TimeInstance } from '@hecom/aDate';
+import { zoneConfig } from '@hecom/aDate/config';
 
 export type AnalyzeResult = string[];
 
@@ -531,8 +532,8 @@ function DATEDIFV2(startTime, endTime, unit) {
         if (startTime == null || endTime == null || unit == null) {
             return null;
         }
-        const startDate = TimeUtils.create(startTime).startOfDay();
-        const endDate = TimeUtils.create(endTime).startOfDay();
+        const startDate = TimeUtils.create(startTime).tz(zoneConfig.systemZone).startOfDay();
+        const endDate = TimeUtils.create(endTime).tz(zoneConfig.systemZone).startOfDay();
         if (!startDate.isValid() || !endDate.isValid()) {
             return null;
         }
@@ -588,11 +589,11 @@ function DATEDIF(startDateTimestamp, endDateTimestamp, unit) {
 }
 
 function TODAY() {
-    return TimeUtils.create().startOfDay().valueOf();
+    return TimeUtils.now().startOfDay().valueOf();
 }
 
 function NOW() {
-    return TimeUtils.create().millisecond(0).valueOf();
+    return TimeUtils.now().millisecond(0).valueOf();
 }
 
 function TIMEOFFSET(startTimestamp, unit, value) {
@@ -811,7 +812,7 @@ function DAY(date) {
     if (!timeObj?.isValid()) {
         return null;
     }
-    const day = timeObj.getDate();
+    const day = timeObj.getDate(true);
     return day > 0 ? day : null;
 }
 
@@ -823,7 +824,7 @@ function MONTH(date) {
     if (!timeObj?.isValid()) {
         return null;
     }
-    const month = timeObj.getMonth() + 1;
+    const month = timeObj.getMonth(true) + 1;
     return month > 0 ? month : null;
 }
 
@@ -835,7 +836,7 @@ function YEAR(date: string | number | TimeInstance): number | undefined {
     if (!time?.isValid()) {
         return null;
     }
-    const year = time.getYear();
+    const year = time.getYear(true);
     return year > 0 ? year : null;
 }
 
@@ -864,7 +865,8 @@ function TODATE(year, month, day) {
         }
     }
     try {
-        return TimeUtils.create().year(Number(year)).month(Number(month) - 1).date(Number(day)).startOfDay().valueOf();
+        const date = TimeUtils.create(`${year}-${month}-${day} 00:00:00`, undefined, zoneConfig.systemZone);
+        return date.valueOf();
     } catch (e) {
         return null
     }
@@ -1066,7 +1068,8 @@ function ID_TO_AGE(idCard: string): number | null {
     if (isNaN(month) || isNaN(day) || month > 12 || month === 0 || day > 31 || day === 0) {
         return null;
     }
-    const currentTime = TimeUtils.create();
+    // 从身份证号解析出来的年、月、日是北京时间，计算年龄时只需要将当前时间的时区和上面的时区对齐即可，即将当前时间的时区转换到北京时区
+    const currentTime = TimeUtils.create().tz('Asia/Shanghai');
     const currentTimestamp = currentTime.valueOf();
     const currentYear = currentTime.getYear();
     const birthDay = currentYear + '-' + `${month}-${day}`;
@@ -1093,7 +1096,7 @@ function WEEKDAY(date: number, return_type: 1 | 2 | 3 = 1): number {
     if (result == null) {
         return null;
     }
-    const weekDay = result.getDay();
+    const weekDay = result.getDay(true);
     if (return_type === 1) {
         return weekDay + 1
     } else if (return_type === 2) {
@@ -1122,9 +1125,9 @@ function DATEVALUE(text: string | number | TimeInstance): string {
         return null;
     }
     try {
-        const year = result.getYear();
-        const month = result.getMonth() + 1;
-        const day = result.getDate();
+        const year = result.getYear(true);
+        const month = result.getMonth(true) + 1;
+        const day = result.getDate(true);
         return year + '年' + month + '月' + day + '日';
     } catch (e) {
         return null;

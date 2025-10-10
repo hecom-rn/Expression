@@ -4,8 +4,9 @@
   "private": false,
   "description": "Calculate Expression",
   "main": "src/index.ts",
+  "type": "module",
   "scripts": {
-    "test": "node __test__/function/csv2json.js;jest",
+    "test": "npx tsx __test__/function/csv2json.ts;jest",
     "lint": "./node_modules/.bin/eslint . --ext .ts,.tsx;",
     "minor": "npm version minor -m 'Bump version %s';git push origin master --tags",
     "patch": "npm version patch -m 'Bump version %s';git push origin master --tags"
@@ -45,6 +46,6 @@
   },
   "dependencies": {
     "decimal.js": "^10.4.3",
-    "@hecom/aDate": "https://github.com/hecom-rn/aDate.git#dd30247e814b98096f7d42dc50ec3314a43cda3d"
+    "@hecom/aDate": "https://github.com/hecom-rn/aDate.git"
   }
 }

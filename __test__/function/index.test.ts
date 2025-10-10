@@ -1,7 +1,8 @@
 import Expression, {_dateFromAny} from '../../src/index';
 import testCaseList from './函数公式.json';
 import {advanceTo, clear} from 'jest-date-mock';
-import { TimeUtils } from '@hecom/aDate';
+import {setSystemTimezone, setDefaultTimezone, TimeUtils} from '@hecom/aDate';
+import {beforeEach} from 'jest-circus';
 
 const funcMap = Object.keys(Expression.funcMap).reduce((pre, cur) => {
     pre[cur] = (...args) => {
@@ -9,14 +10,28 @@ const funcMap = Object.keys(Expression.funcMap).reduce((pre, cur) => {
     }
     return pre;
 }, {} as typeof Expression.funcMap);
+
+export const setTimeZone = (defaultTimezone: string = 'Asia/Shanghai', systemTimezone: string = 'Asia/Shanghai') => {
+    // 默认设置个人时区为上海，租户时区为首尔，如果需要测试其他时区，单测内自行设置
+    setDefaultTimezone(defaultTimezone);
+    setSystemTimezone(systemTimezone);
+};
+
 const allTestCase = testCaseList.map(testCase => Object.assign(testCase, {toString: () => testCase.code.substring(-3)}))
 describe('时间函数测试', () => {
+    beforeEach(() => {
+        // 默认设置个人时区为上海，租户时区为首尔，如果需要测试其他时区，单测内自行设置
+        setTimeZone('Asia/Shanghai','Asia/Shanghai');
+    });
     it.each(allTestCase.filter(item => item.code.startsWith('DATEDIF')))('DATEDIF-%s', ({
                                                                                             ['返回值']: result,
                                                                                             ['参数1']: start,
                                                                                             ['参数2']: end,
                                                                                             ['参数3']: type,
+                                                                                            ['个人时区']: defaultZone,
+                                                                                            ['租户时区']: systemZone,
                                                                                         }) => {
+        setTimeZone(defaultZone, systemZone);
         expect(funcMap.DATEDIFV2(start, end, type)).toEqual(result === null ? result : Number(result))
     })
     it.each(allTestCase.filter(item => item.code.includes('TIMEDIF')))('TIMEDIF-%s', ({
@@ -54,21 +69,30 @@ describe('时间函数测试', () => {
         expect(date).toEqual(result === null ? result : _dateFromAny(result)?.valueOf())
     })
     it.each(allTestCase.filter(item => item.code.startsWith('DAY')))('DAY-%s', ({
-                                                                                  ['返回值']: result,
-                                                                                  ['参数1']: date,
+                                                                                    ['返回值']: result,
+                                                                                    ['参数1']: date,
+                                                                                    ['个人时区']: defaultZone,
+                                                                                    ['租户时区']: systemZone,
                                                                               }) => {
+        setTimeZone(defaultZone, systemZone);
         expect(funcMap.DAY(date)).toEqual(result == null ? result : Number(result));
     })
     it.each(allTestCase.filter(item => item.code.includes('MONTH')))('MONTH-%s', ({
                                                                                       ['返回值']: result,
                                                                                       ['参数1']: date,
+                                                                                      ['个人时区']: defaultZone,
+                                                                                      ['租户时区']: systemZone,
                                                                                   }) => {
+        setTimeZone(defaultZone, systemZone);
         expect(funcMap.MONTH(date)).toEqual(result == null ? result : Number(result))
     })
     it.each(allTestCase.filter(item => item.code.includes('YEAR')))('YEAR-%s', ({
                                                                                     ['返回值']: result,
                                                                                     ['参数1']: date,
+                                                                                    ['个人时区']: defaultZone,
+                                                                                    ['租户时区']: systemZone,
                                                                                 }: any) => {
+        setTimeZone(defaultZone, systemZone);
         expect(funcMap.YEAR(date)).toEqual(result == null ? result : Number(result))
     })
     it.each(allTestCase.filter(item => item.code.includes('TODATE')))('TODATE-%s', ({
@@ -76,22 +100,33 @@ describe('时间函数测试', () => {
                                                                                         ['参数1']: year,
                                                                                         ['参数2']: month,
                                                                                         ['参数3']: day,
+                                                                                        ['个人时区']: defaultZone,
+                                                                                        ['租户时区']: systemZone,
                                                                                     }: any) => {
+
+        setTimeZone(defaultZone, systemZone);
         const date = funcMap.TODATE(year, month, day);
         expect(date).toEqual(
-            result === null || result == '' || result == undefined ? result : _dateFromAny(result).valueOf())
+            result === null || result == '' || result == undefined ? result : _dateFromAny(result).valueOf(true))
     })
     it.each(allTestCase.filter(item => item.code.includes('DATEVALUE')))('DATEVALUE-%s', ({
                                                                                               ['返回值']: result,
                                                                                               ['参数1']: date,
+                                                                                              ['个人时区']: defaultZone,
+                                                                                              ['租户时区']: systemZone,
                                                                                           }: any) => {
+
+        setTimeZone(defaultZone, systemZone);
         expect(funcMap.DATEVALUE(date)).toEqual(result);
     })
     it.each(allTestCase.filter(item => item.code.includes('WEEKDAY')))('WEEKDAY-%s', ({
                                                                                           ['返回值']: result,
                                                                                           ['参数1']: value,
                                                                                           ['参数2']: type,
+                                                                                          ['个人时区']: defaultZone,
+                                                                                          ['租户时区']: systemZone,
                                                                                       }: any) => {
+        setTimeZone(defaultZone, systemZone);
         const date = _dateFromAny(value);
         expect(funcMap.WEEKDAY((date == null ? value : date.valueOf()) as number,
             (type == null || type == undefined || isNaN(Number(type)) ? type : Number(type)) as 1 | 2 | 3))
