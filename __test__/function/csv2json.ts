@@ -15,7 +15,7 @@ const convert = (value, obj, useSystemZone) => {
     } else if (value === 'TRUE' || value === 'true') {
         return true;
     } else if (value.startsWith('日期：') || value.startsWith('时间：')) {
-        return TimeUtils.create(value.replace('日期：', '').replace('时间：', ''), undefined, (useSystemZone ? obj['租户时区'] : obj['个人时区']) || 'Asia/Shanghai').valueOf();
+        return TimeUtils.create(value.replace('日期：', '').replace('时间：', ''), 'YYYY/M/D H:m:s', (useSystemZone ? obj['租户时区'] : obj['个人时区']) || 'Asia/Shanghai').valueOf();
     } else if (value.startsWith('文本：')) {
         return value.replace('文本：', '')
     } else if (value.startsWith('数值：')) {
