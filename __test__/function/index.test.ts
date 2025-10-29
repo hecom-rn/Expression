@@ -2,7 +2,6 @@ import Expression, {_dateFromAny} from '../../src/index';
 import testCaseList from './函数公式.json';
 import {advanceTo, clear} from 'jest-date-mock';
 import {setSystemTimezone, setDefaultTimezone, TimeUtils} from '@hecom/aDate';
-import {beforeEach} from 'jest-circus';
 
 const funcMap = Object.keys(Expression.funcMap).reduce((pre, cur) => {
     pre[cur] = (...args) => {
