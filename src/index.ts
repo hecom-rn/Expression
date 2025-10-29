@@ -865,7 +865,7 @@ function TODATE(year, month, day) {
         }
     }
     try {
-        const date = TimeUtils.create(`${year}-${month}-${day} 00:00:00`, undefined, zoneConfig.systemZone);
+        const date = TimeUtils.create(`${year}-${month}-${day} 00:00:00`, 'YYYY-MM-D HH:mm:ss', zoneConfig.systemZone);
         return date.valueOf();
     } catch (e) {
         return null
