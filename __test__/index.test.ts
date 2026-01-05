@@ -1,8 +1,8 @@
-import Expression, { Config, FuncTypeMap } from '../src/index';
-import { advanceTo, clear } from 'jest-date-mock';
-import Sval, { SvalOptions } from "sval";
-import jexl from 'jexl';
 import { TimeUtils } from '@hecom/aDate';
+import { advanceTo, clear } from 'jest-date-mock';
+import jexl from 'jexl';
+import Sval, { SvalOptions } from "sval";
+import Expression, { Config, FuncTypeMap } from '../src/index';
 import { setTimeZone } from './function/index.test';
 
 function expression(content: string, data?: any) {
@@ -111,6 +111,24 @@ describe('多变量测试', () => {
         // eslint-disable-next-line no-template-curly-in-string
         const result = Expression.calculate('${bizData.a + bizData.b + bizData.d}', [], { a: 1, b: 1, d: 1 })
         expect(result).toEqual(3)
+    })
+})
+
+describe('analyze',()=>{
+    beforeAll(initExpression);
+    it('null',()=>{
+        const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+        const expr = '${IF(isNotNULL(bizData.field749),IF(bizData.field749_c >= 80 , 5, IF(bizData.field749_c >= 60,IF(bizData.field749_c >= 40,3,IF(bizData.field749__c>= 20,2,IF(bizData.field749___c > 0,1,0))))),null)}';
+        const result = Expression.analyze(expr,[]);
+        expect(warnSpy).not.toHaveBeenCalled();
+        warnSpy.mockRestore();
+    })
+    it('true/false', ()=>{
+        const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+        const expr = '${true && false}';
+        const result = Expression.analyze(expr,[]);
+        expect(warnSpy).not.toHaveBeenCalled();
+        warnSpy.mockRestore();
     })
 })
 

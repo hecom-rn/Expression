@@ -285,12 +285,20 @@ function _analyze(exprStr: string, fieldnames: string[]): AnalyzeResult[] {
                 return varname.length >= 2 && varname[0] === 'bizData';
             } else if (Object.keys(_DefaultExpressionFuncs).indexOf(varname) >= 0) {
                 return false;
+            } else if (KEY_WORD[varname]) {
+                return false;
             } else {
-                console.warn('Format error', exprStr);
+                console.warn(`unknown variable: '${varname}' in expression: ${exprStr}`);
                 return false;
             }
         });
     }
+}
+
+const KEY_WORD = {
+    'null': true,
+    'true': true,
+    'false': true,
 }
 
 const _DefaultExpressionFuncs = {
