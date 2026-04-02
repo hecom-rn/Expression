@@ -49,5 +49,8 @@
   },
   "peerDependencies": {
     "@hecom/aDate": "https://github.com/hecom-rn/aDate.git"
+  },
+  "devDependencies": {
+    "@hecom/aDate": "https://github.com/hecom-rn/aDate.git"
   }
 }
