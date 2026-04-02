@@ -45,7 +45,9 @@
     "typescript": "^4.1.3"
   },
   "dependencies": {
-    "decimal.js": "^10.4.3",
+    "decimal.js": "^10.4.3"
+  },
+  "peerDependencies": {
     "@hecom/aDate": "https://github.com/hecom-rn/aDate.git"
   }
 }
