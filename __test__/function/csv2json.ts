@@ -1,4 +1,4 @@
-import csv from 'csvtojson/index';
+import csv from 'csvtojson';
 import * as fs from 'node:fs';
 import { TimeUtils } from '@hecom/aDate';
 const csvFilePath = './__test__/function/函数公式.csv'
