@@ -915,7 +915,7 @@ function MIN(...args: any[]): number {
 
 function SUM(...args: any[]): number {
     if (Array.isArray(args) && args.length === 0) {
-        return null;
+        return 0;
     }
     let total = new Decimal(0);
     let hasValidNumber = false;
@@ -932,7 +932,7 @@ function SUM(...args: any[]): number {
     args.forEach(processItem);
 
     if (!hasValidNumber) {
-        return null;
+        return 0;
     }
     return total.toNumber();
 }

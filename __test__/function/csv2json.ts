@@ -20,6 +20,12 @@ const convert = (value, obj, useSystemZone) => {
         return value.replace('文本：', '')
     } else if (value.startsWith('数值：')) {
         return Number(value.replace('数值：', ''))
+    } else if (value.startsWith('数组：')) {
+        const tmp = value.replace('数组：', '');
+        if (tmp?.length > 0) {
+            return JSON.parse(tmp);
+        }
+        return null;
     } else {
         return value;
     }

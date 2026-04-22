@@ -218,6 +218,17 @@ describe('数学函数测试', () => {
         const args = [arg1, arg2, arg3, arg4, arg5].filter(i => i !== undefined)
         expect(funcMap.MIN(...args)).toEqual(result === null ? result : Number(result))
     })
+    it.each(allTestCase.filter(item => item.code.includes('SUM')))('SUM-%s', ({
+                                                                                  ['返回值']: result,
+                                                                                  ['参数1']: arg1,
+                                                                                  ['参数2']: arg2,
+                                                                                  ['参数3']: arg3,
+                                                                                  ['参数4']: arg4,
+                                                                                  ['参数5']: arg5,
+                                                                              }) => {
+        const args = [arg1, arg2, arg3, arg4, arg5].filter(i => i !== undefined)
+        expect(funcMap.SUM(...args)).toEqual(result === null ? result : Number(result))
+    })
 })
 
 describe('文本函数测试', () => {
