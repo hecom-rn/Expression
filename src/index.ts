@@ -303,7 +303,7 @@ const KEY_WORD = {
 
 const _DefaultExpressionFuncs = {
     // 数学函数
-    ABS, CEILING, FLOOR, LN, LOG, MOD, ROUND, SQRT, THOUSANDSEP, MAX, MIN,
+    ABS, CEILING, FLOOR, LN, LOG, MOD, ROUND, SQRT, THOUSANDSEP, MAX, MIN, SUM,
     // 时间函数
     TIMEDIF, DATEDIF, DATEDIFV2, TODAY, NOW, DATEOFFSET, TIMEOFFSET, DAY, MONTH, YEAR, TODATE, DATEVALUE, WEEKDAY, TOTIMESTAMP,
     // 逻辑函数
@@ -383,6 +383,7 @@ export const FuncTypeMap: FunctionTypeMap = {
     THOUSANDSEP: { name: 'THOUSANDSEP', returnType: TYPE.STRING, argsType: () => TYPE.NUMBER },
     MAX: { name: 'MAX', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER },
     MIN: { name: 'MIN', returnType: TYPE.NUMBER, argsType: () => TYPE.NUMBER },
+    SUM: { name: 'SUM', returnType: TYPE.NUMBER, argsType: () => TYPE.ANY },
 
 }
 
@@ -910,6 +911,30 @@ function MIN(...args: any[]): number {
         return null;
     }
     return Math.min(...numArr);
+}
+
+function SUM(...args: any[]): number {
+    if (Array.isArray(args) && args.length === 0) {
+        return null;
+    }
+    let total = new Decimal(0);
+    let hasValidNumber = false;
+
+    function processItem(item: any) {
+        if (Array.isArray(item)) {
+            item.forEach(processItem);
+        } else if (item !== null && item !== undefined && item !== '' && !isNaN(item as any)) {
+            total = total.plus(item);
+            hasValidNumber = true;
+        }
+    }
+
+    args.forEach(processItem);
+
+    if (!hasValidNumber) {
+        return null;
+    }
+    return total.toNumber();
 }
 
 function TOCAPITAL(number): string {
