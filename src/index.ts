@@ -923,8 +923,11 @@ function SUM(...args: any[]): number {
     function processItem(item: any) {
         if (Array.isArray(item)) {
             item.forEach(processItem);
-        } else if (item !== null && item !== undefined && item !== '' && !isNaN(item as any)) {
+        } else if (typeof item === 'number') {
             total = total.plus(item);
+            hasValidNumber = true;
+        } else if (typeof item === 'boolean') {
+            total = total.plus(item ? 1 : 0);
             hasValidNumber = true;
         }
     }
