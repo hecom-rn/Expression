@@ -769,7 +769,12 @@ export function _dateFromAny(obj: string | number | TimeInstance): TimeInstance 
     }
 }
 
-function TO_CAPITAL_RMB(money) {
+function TO_CAPITAL_RMB(inValue) {
+    let money = inValue;
+    if (typeof money === 'string') {
+        // 去掉千分位
+        money = money.replace(/,/g, '');
+    }
     if (money == null || money === '' || isNaN(money)) {
         return null;
     }
@@ -940,7 +945,12 @@ function SUM(...args: any[]): number {
     return total.toNumber();
 }
 
-function TOCAPITAL(number): string {
+function TOCAPITAL(inValue): string {
+    let number = inValue;
+    if (typeof number === 'string') {
+        // 去掉千分位
+        number = number.replace(/,/g, '');
+    }
     if (number === undefined || number === null || number === '' || isNaN(number)) {
         return null;
     }
