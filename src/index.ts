@@ -981,13 +981,27 @@ function TOCAPITAL(inValue): string {
         }
 
         if (Math.abs(number) >= 1) {
+            let zeroPending = false;
             for (let i = 0; i < unit[0].length && integerNum > 0; i++) {
                 let cycle = '';
                 for (let j = 0; j < unit[1].length && integerNum > 0; j++) {
                     cycle = digit[integerNum % 10] + (digit[integerNum % 10] !== '零' ? unit[1][j] : '') + cycle;
                     integerNum = Math.floor(integerNum / 10);
                 }
-                integerChinese = cycle.replace(/零{2,}/, '零').replace(/零$/, '') + unit[0][i] + integerChinese;
+                cycle = cycle.replace(/零{2,}/, '零').replace(/零$/, '');
+                if (cycle === '') {
+                    // 整组全零时跳过组单位（如两亿不能读作"贰亿万"）；低位已有输出时向高位组记一笔待补的连接零
+                    if (integerChinese) {
+                        zeroPending = true;
+                    }
+                } else if (zeroPending && !integerChinese.startsWith('零')) {
+                    // 低位组输出未以零开头（无前导零承担连接）时，在组单位后补一个零（如一亿一千读作"壹亿零壹仟"）
+                    integerChinese = cycle + unit[0][i] + '零' + integerChinese;
+                    zeroPending = false;
+                } else {
+                    integerChinese = cycle + unit[0][i] + integerChinese;
+                    zeroPending = false;
+                }
             }
         } else {
             integerChinese = '零';
