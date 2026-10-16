@@ -16,6 +16,9 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # 日期类函数用例的期望值按东八区断言（沿袭 .travis.yml 的 TZ=Asia/Shanghai）
+    env:
+      TZ: Asia/Shanghai
     permissions:
       contents: read
       id-token: write
